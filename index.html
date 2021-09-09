@@ -45,7 +45,6 @@
         placeholder="Nome"
         v-model="new_name.name"
         @input="new_name.error = false "
-        @blur="checkName()"
         required="required"
        />
       </label>
@@ -57,15 +56,7 @@
         src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAgMjIuNjIxbC0zLjUyMS02Ljc5NWMtLjAwOC4wMDQtMS45NzQuOTctMi4wNjQgMS4wMTEtMi4yNCAxLjA4Ni02Ljc5OS03LjgyLTQuNjA5LTguOTk0bDIuMDgzLTEuMDI2LTMuNDkzLTYuODE3LTIuMTA2IDEuMDM5Yy03LjIwMiAzLjc1NSA0LjIzMyAyNS45ODIgMTEuNiAyMi42MTUuMTIxLS4wNTUgMi4xMDItMS4wMjkgMi4xMS0xLjAzM3oiLz48L3N2Zz4="
        />
 
-       <input
-        class="form__input"
-        type="tel"
-        id="new__phone_number"
-        placeholder="telefone"
-        v-model="new_number.number"
-        @blur="checkNumber()"
-        required
-       />
+       <input class="form__input" type="tel" id="new__phone_number" placeholder="telefone" v-model="new_number.number" required />
       </label>
       <div v-if="new_number.error" class="input_error">{{new_number.error_msg}}</div>
 
@@ -747,16 +738,13 @@
     },
     new_name: {
      handler() {
-      if (this.new_number.number !== "") {
-       if (/^([a-zA-Z -]{2,}\s[a-zA-z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)/) {
-        this.new_number.error = true;
-       }
-      }
+      this.checkName();
      },
      deep: true,
     },
     new_number: {
      handler() {
+      this.checkNumber();
       this.numberMask();
       this.checkIsSpecial();
      },
@@ -815,7 +803,7 @@
       this.contact_list.push(contact);
       this.resetForm();
       this.id_cont++;
-      // this.show_add_btn = true;
+      this.show_add_btn = true;
      }
     },
     resetForm() {
@@ -834,27 +822,27 @@
      this.new_number.error_msg = "";
     },
     checkName() {
-     var msg;
-     var time = 8000;
-     if (!this.new_name.name.includes(" ")) {
-      msg = "O nome precisa ter no mínimo duas palavras de no mínimo 3 letras cada.";
-      this.showError("new_name", msg, time);
-      return false;
+     if (this.new_name.name !== "") {
+      //  Doesn't accept space at the end
+      var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
+      var teste = regex.test(this.new_name.name);
+      console.log(teste);
+      if (teste) {
+       this.new_name.error = false;
+       return true;
+      } else this.new_name.error = true;
      }
-     if (this.new_name.name === "") {
-      msg = "Preecha o nome.";
-      time = 4000;
-      this.showError("new_name", msg, time);
-      return false;
-     } else return true;
+     return false;
+
+     //  Do accept space at the end
+     //  var regex = /^([a-z]{3,}[\S]*(?=\s|$) ?){2,}$/gim;
     },
     checkNumber() {
      var number = this.new_number.number;
-     var time = 5000;
      var msg;
      if (number !== "" && number.length < 15) {
       msg = "Preecha o telefone corretamente.";
-      this.showError("new_number", msg, time);
+      this.showError("new_number", msg);
       return false;
      } else return true;
     },
@@ -865,7 +853,7 @@
       this.new_number.special = false;
      }
     },
-    showError(elem, msg, time) {
+    showError(elem, msg) {
      if (elem === "new_name") {
       this.new_name.error = true;
       this.new_name.error_msg = msg;
@@ -874,10 +862,6 @@
       this.new_number.error = true;
       this.new_number.error_msg = msg;
      }
-     setTimeout(() => {
-      if (elem === "new_name") this.new_name.error = false;
-      if (elem === "new_number") this.new_number.error = false;
-     }, time);
     },
     editContact() {},
     deleteContact(index, event) {
