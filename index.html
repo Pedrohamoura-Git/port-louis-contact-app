@@ -27,13 +27,16 @@
  <body>
   <div id="app">
    <div class="wrapper">
-    <button v-if="show_add_btn" class="btn btn--add" @click="toggleBtn()">+</button>
-    <button v-else class="btn btn--close" @click="toggleBtn()">x</button>
+    <button v-if="show_add_btn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
+    <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button>
 
     <div v-if="show_form" class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
+      <!-- ERROR MSG  -->
       <!-- <div v-if="new_name.error" class="form__input--correctnew_name.error_msg}}</div> -->
+      <!-- ERROR MSG  -->
+
       <label for="new__name" class="form__label">
        <img
         class="label__icon"
@@ -52,9 +55,10 @@
         required="required"
        />
       </label>
-      <!-- :class="[new_name.error ? 'form__input--error' : 'form__input--correct']" -->
 
+      <!-- ERROR MSG  -->
       <!-- <div v-if="new_number.error" class="input_error">{{new_number.error_msg}}</div> -->
+      <!-- ERROR MSG  -->
       <label for="new__phone_number" class="form__label">
        <img
         class="label__icon"
@@ -76,9 +80,7 @@
         required="required"
        />
       </label>
-      <!-- @keydown.backspace="disableMask()" -->
-      <!-- @focus="disableNumberMask()"
-      @blur="addNumberMask()" -->
+
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
        <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
@@ -345,14 +347,14 @@
     }
 
     &--correct {
-     border: 1.5px solid @bg-color-btn-add-hover !important;
+     border: 1px solid @bg-color-btn-add-hover !important;
      outline: none;
      line-height: 1.5rem;
      transition: @transition-time-quick;
     }
 
     &--error {
-     border: 1.5px solid @bg-color-error !important;
+     border: 1px solid @bg-color-error !important;
      /* outline: 2px solid white; */
      line-height: 1.5rem;
      transition: @transition-time-quick;
@@ -501,8 +503,8 @@
     contact_list: {
      handler() {
       this.updateLocalStorage("set");
-      this.updateShowForm();
-      this.updateShowList();
+      this.ShowForm();
+      this.ShowContactList();
      },
      deep: true,
     },
@@ -516,7 +518,6 @@
     new_number: {
      handler() {
       this.checkNumber();
-      // this.addNumberMask();
       this.checkIsSpecial();
       this.numberClassesToggle();
      },
@@ -592,9 +593,13 @@
      var msg;
      if (number !== "" && number.length < 15) {
       msg = "Preecha o telefone corretamente.";
+      this.new_number.error = true;
       this.showError("new_number", msg);
       return false;
-     } else return true;
+     } else {
+      this.new_number.error = false;
+      return true;
+     }
     },
     checkIsSpecial() {
      if (this.new_number.number.includes("(11) ")) {
@@ -639,16 +644,16 @@
       localStorage.setItem("contact_list", JSON.stringify(this.contact_list));
      }
     },
-    toggleBtn() {
+    toggleShowFormBtn() {
      if (this.show_add_btn) {
-      this.updateShowForm(true, true);
+      this.ShowForm(true, true);
       this.show_add_btn = false;
      } else {
-      this.updateShowForm(true, false);
+      this.ShowForm(true, false);
       this.show_add_btn = true;
      }
     },
-    updateShowForm(imperative, value) {
+    ShowForm(imperative, value) {
      if (imperative) {
       this.show_form = value;
      } else {
@@ -656,7 +661,7 @@
       else this.show_form = true;
      }
     },
-    updateShowList(imperative, value) {
+    ShowContactList(imperative, value) {
      if (imperative) {
       this.show_list = value;
      } else {
