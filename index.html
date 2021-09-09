@@ -29,13 +29,10 @@
    <div class="wrapper">
     <button v-if="show_add_btn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
     <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button>
-
-    <div v-if="show_form" class="new_contact">
+    <!-- v-if="show_form" -->
+    <div class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
-      <!-- ERROR MSG  -->
-      <!-- <div v-if="new_name.error" class="form__input--correctnew_name.error_msg}}</div> -->
-      <!-- ERROR MSG  -->
 
       <label for="new__name" class="form__label">
        <img
@@ -54,11 +51,19 @@
         v-model="new_name.name"
         required="required"
        />
+       <!-- v-if="nameIsWrong" -->
+       <span v-if="nameIsWrong" class="btn--warning_info" @click="nameToggleErrorMsg()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+         <path
+          d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
+         />
+        </svg>
+       </span>
       </label>
+      <!-- ERROR MSG  -->
+      <div v-if="new_name.show_error_msg" class="error_card">{{new_name.error_msg}}12321312</div>
+      <!-- ERROR MSG  -->
 
-      <!-- ERROR MSG  -->
-      <!-- <div v-if="new_number.error" class="input_error">{{new_number.error_msg}}</div> -->
-      <!-- ERROR MSG  -->
       <label for="new__phone_number" class="form__label">
        <img
         class="label__icon"
@@ -79,8 +84,18 @@
         @keydown.backspace="disableNumberMask()"
         required="required"
        />
+       <!-- v-if="numberIsWrong" -->
+       <span v-if="numberIsWrong" class="btn--warning_info" @click="numberToggleErrorMsg()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+         <path
+          d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
+         />
+        </svg>
+       </span>
       </label>
-
+      <!-- ERROR MSG  -->
+      <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}} | Teste</div>
+      <!-- ERROR MSG  -->
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
        <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
@@ -131,10 +146,10 @@
   @bg-color-btn-add-hover: #00d689;
   @bg-color-btn-clear: 255, 255, 255;
   @bg-color-btn-clear-hover: 255, 255, 255;
-  @bg-color-btn-close-delete: #d65656;
   @bg-color-card: #f9f2e7;
   @bg-color-error: #F6AA93;
   @bg-color-thead: #517ACB;
+  @bg-color-warning: #d65656;
   /* @bg-color-thead: #55608F; */
   @bg-rbg-color-table: 255, 255, 255;
   @border-radius-small: 10px;
@@ -145,7 +160,8 @@
   @transition-time-quick: .3s;
   @txt-color-header: #fff;
   @txt-color: #fff;
-  @txt-color-error: #8C233E;
+  @txt-color-error: #fff;
+  /* @txt-color-error: #8C233E; */
 
   * {
    box-sizing: border-box;
@@ -198,6 +214,25 @@
     transition: @transition-time-quick;
    }
 
+   &--warning_info {
+    svg {
+     height: 17px;
+     position: absolute;
+     top: -6px;
+     left: 10px;
+     /* top: -13px;
+     right: -9px; */
+
+     path {
+      fill: @bg-color-warning;
+     }
+    }
+
+    &:hover {
+     cursor: pointer;
+    }
+   }
+
    &--green {
     background-color: @bg-color-btn-add;
     color: #ffffff;
@@ -241,7 +276,7 @@
    }
 
    &--close {
-    background-color: @bg-color-btn-close-delete;
+    background-color: @bg-color-warning;
    }
 
    &--edit,
@@ -274,7 +309,7 @@
 
    &--delete {
     path {
-     fill: @bg-color-btn-close-delete;
+     fill: @bg-color-warning;
     }
    }
   }
@@ -306,7 +341,9 @@
      display: flex;
      align-items: center;
      justify-content: space-between;
-     margin: 3px 0;
+     /* margin: 3px 0; */
+     margin: 8px 3px;
+     position: relative;
 
      .form__input {
       padding: @padding-small;
@@ -354,22 +391,20 @@
     }
 
     &--error {
-     border: 1px solid @bg-color-error !important;
-     /* outline: 2px solid white; */
+     border: 1px solid @bg-color-warning !important;
      line-height: 1.5rem;
      transition: @transition-time-quick;
-
-     &-error__msg {
-      align-self: flex-end;
-      background-color: @bg-color-error;
-      border-radius: @border-radius-very-small;
-      color: @txt-color-error;
-      padding: @padding-small;
-      text-align: center;
-      transition: @transition-time-quick;
-      width: 90%;
-     }
     }
+   }
+   .error_card {
+    align-self: flex-end;
+    background-color: @bg-color-warning;
+    border-radius: @border-radius-very-small;
+    color: @txt-color-error;
+    padding: @padding-small;
+    text-align: center;
+    transition: @transition-time-quick;
+    width: 90%;
    }
   }
 
@@ -485,12 +520,14 @@
       name: "",
       error: false,
       error_msg: "",
+      show_error_msg: false,
      },
      new_number: {
       number: "",
       backupNumber: "",
       error: false,
       error_msg: "",
+      show_error_msg: false,
       special: false,
      },
     };
@@ -525,6 +562,14 @@
     },
    },
    methods: {
+    nameToggleErrorMsg() {
+     this.new_name.show_error_msg = !this.new_name.show_error_msg;
+     console.log(this.new_name.show_error_msg);
+    },
+    numberToggleErrorMsg() {
+     this.new_number.show_error_msg = !this.new_number.show_error_msg;
+     console.log(this.new_number.show_error_msg);
+    },
     newNumberInput() {
      this.doNumberBackup();
      this.addNumberMask();
@@ -594,7 +639,7 @@
      if (number !== "" && number.length < 15) {
       msg = "Preecha o telefone corretamente.";
       this.new_number.error = true;
-      this.showError("new_number", msg);
+      this.updateErrorMsg("new_number", msg);
       return false;
      } else {
       this.new_number.error = false;
@@ -608,7 +653,7 @@
       this.new_number.special = false;
      }
     },
-    showError(elem, msg) {
+    updateErrorMsg(elem, msg) {
      if (elem === "new_name") {
       this.new_name.error = true;
       this.new_name.error_msg = msg;
