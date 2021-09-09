@@ -33,6 +33,7 @@
     <div v-if="show_form" class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
+      <!-- <div v-if="new_name.error" class="form__input--correctnew_name.error_msg}}</div> -->
       <label for="new__name" class="form__label">
        <img
         class="label__icon"
@@ -41,25 +42,43 @@
        <input
         class="form__input"
         type="text"
+        :class="[
+        {'': nameIsEmpty}, 
+        {'form__input--error': nameIsWrong},
+        {'form__input--correct': nameIsCorrect}]"
         id="new__name"
         placeholder="Nome"
         v-model="new_name.name"
-        @input="new_name.error = false "
         required="required"
        />
       </label>
-      <div v-if="new_name.error" class="input_error">{{new_name.error_msg}}</div>
+      <!-- :class="[new_name.error ? 'form__input--error' : 'form__input--correct']" -->
 
+      <!-- <div v-if="new_number.error" class="input_error">{{new_number.error_msg}}</div> -->
       <label for="new__phone_number" class="form__label">
        <img
         class="label__icon"
         src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAgMjIuNjIxbC0zLjUyMS02Ljc5NWMtLjAwOC4wMDQtMS45NzQuOTctMi4wNjQgMS4wMTEtMi4yNCAxLjA4Ni02Ljc5OS03LjgyLTQuNjA5LTguOTk0bDIuMDgzLTEuMDI2LTMuNDkzLTYuODE3LTIuMTA2IDEuMDM5Yy03LjIwMiAzLjc1NSA0LjIzMyAyNS45ODIgMTEuNiAyMi42MTUuMTIxLS4wNTUgMi4xMDItMS4wMjkgMi4xMS0xLjAzM3oiLz48L3N2Zz4="
        />
 
-       <input class="form__input" type="tel" id="new__phone_number" placeholder="telefone" v-model="new_number.number" required />
+       <input
+        class="form__input"
+        :class="[
+        {'': numberIsEmpty}, 
+        {'form__input--error': numberIsWrong},
+        {'form__input--correct': numberIsCorrect}]"
+        type="tel"
+        id="new__phone_number"
+        placeholder="telefone"
+        v-model="new_number.number"
+        @input="newNumberInput()"
+        @keydown.backspace="disableNumberMask()"
+        required="required"
+       />
       </label>
-      <div v-if="new_number.error" class="input_error">{{new_number.error_msg}}</div>
-
+      <!-- @keydown.backspace="disableMask()" -->
+      <!-- @focus="disableNumberMask()"
+      @blur="addNumberMask()" -->
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
        <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
@@ -259,12 +278,12 @@
   }
 
   /**************************
-  ** Common classes
-  **************************/
+    ** Common classes
+    **************************/
 
   /**************************
-  ** New contact form
-  **************************/
+    ** New contact form
+    **************************/
   .new_contact {
    transition: @transition-time-quick;
    width: 100%;
@@ -306,17 +325,6 @@
      }
     }
 
-    .input_error {
-     align-self: flex-end;
-     background-color: @bg-color-error;
-     border-radius: @border-radius-very-small;
-     color: @txt-color-error;
-     padding: @padding-small;
-     text-align: center;
-     transition: @transition-time-quick;
-     width: 90%;
-    }
-
     &__options {
      display: flex;
      align-items: center;
@@ -333,17 +341,39 @@
     transition: @transition-time-quick;
 
     &:focus {
-     border: 1.5px solid @bg-color-btn-add-hover;
+     outline: none;
+    }
+
+    &--correct {
+     border: 1.5px solid @bg-color-btn-add-hover !important;
      outline: none;
      line-height: 1.5rem;
      transition: @transition-time-quick;
+    }
+
+    &--error {
+     border: 1.5px solid @bg-color-error !important;
+     /* outline: 2px solid white; */
+     line-height: 1.5rem;
+     transition: @transition-time-quick;
+
+     &-error__msg {
+      align-self: flex-end;
+      background-color: @bg-color-error;
+      border-radius: @border-radius-very-small;
+      color: @txt-color-error;
+      padding: @padding-small;
+      text-align: center;
+      transition: @transition-time-quick;
+      width: 90%;
+     }
     }
    }
   }
 
   /**************************
-    ** Contact list
-    **************************/
+      ** Contact list
+      **************************/
   .contact-list {
    width: 100%;
 
@@ -424,279 +454,10 @@
       }
      }
     }
-
-    /* .btn--edit,
-      .btn--delete {
-       background-color: rgba(@bg-rbg-color-table, 0);
-       border: none;
-       border-radius: 50%;
-
-       &:hover {
-        cursor: pointer;
-       }
-
-       svg {
-        border-radius: 50%;
-        background-color: rgba(@bg-rbg-color-table, 0);
-        transition: @transition-time-quick;
-
-        &:hover {
-         transform: scale(1.15);c
-         transition: @transition-time-quick;
-        }
-       }
-      }
-
-      .btn--edit {
-       path {
-        fill: #cfff04;
-       }
-      }
-
-      .btn--delete {
-       path {
-        fill: @bg-color-btn-close-delete;
-       }
-      } */
    }
   }
  </style>
 
- <!-- CSS  -->
- <!-- <style type="text/less">
-  @import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,600;0,900;1,400;1,600;1,900&display=swap");
-
-  @bg-color-btn-add: #4C939A;
-  @bg-color-btn-add-hover: #00d689;
-  @bg-color-card: #f9f2e7;
-  @bg-color-error: #F6AA93;
-  @bg-color-thead: #55608F;
-  @bg-rbg-color-table: 255, 255, 255;
-  @border-radius-small: 10px;
-  @border-radius-very-small: calc(@border-radius-small / 2);
-  @box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-  @margin-tb-3: 30px 0;
-  @padding-small: 10px;
-  @transition-time-quick: .3s;
-  @txt-color-header: #fff;
-  @txt-color: #fff;
-  @txt-color-error: #8C233E;
-
-  * {
-   box-sizing: border-box;
-   font-family: "Urbanist", Helvetica, sans-serif;
-   letter-spacing: 1.5px;
-   list-style-type: none;
-   margin: 0;
-   padding: 0;
-  }
-  body {
-   /* background-image: url(http://www.jotform.com/uploads/eee/form_files/blurry-gaussian_00420663.jpg); */
-   background: linear-gradient(21deg, #49a09d, #5f2c82);
-  }
-  #app {
-   color: #fff;
-   display: flex;
-   height: 100vh;
-   justify-content: center;
-   margin: 8vh 0;
-  }
-  .wrapper {
-   display: flex;
-   align-items: center;
-   flex-direction: column;
-   margin: 0 auto;
-   width: 90%;
-  }
-  .block__title {
-   color: #fff;
-   font-size: 1.8rem;
-   margin: 21px 0;
-   text-align: center;
-  }
-  .btn {
-   border: none;
-   border-radius: calc(10px / 2);
-   color: #ffffff;
-   font-size: 14px;
-   font-weight: 600;
-   margin: 10px auto;
-   padding: 7px 12px;
-   text-transform: uppercase;
-   width: 60%;
-   transition: 0.3s;
-  }
-  .btn:hover {
-   cursor: pointer;
-   transform: scale(1.02);
-   transition: 0.3s;
-  }
-  .btn:focus-visible {
-   outline: 1px solid #fff;
-  }
-  .input_error {
-   align-self: flex-end;
-   background-color: #f6aa93;
-   border-radius: calc(10px / 2);
-   color: #8c233e;
-   padding: 10px;
-   text-align: center;
-   transition: 0.3s;
-   width: 90%;
-  }
-  .new_contact {
-   transition: 0.3s;
-   width: 100%;
-  }
-  .new_contact .form {
-   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-   border-radius: 10px;
-   display: flex;
-   flex-direction: column;
-   padding: 10px;
-   width: 100%;
-  }
-  .new_contact .form__title {
-   text-align: center;
-  }
-  .new_contact .form__label {
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   margin: 3px 0;
-  }
-  .new_contact .form__label .form__input {
-   padding: 10px;
-  }
-  .new_contact .form__label #new__name,
-  .new_contact .form__label #new__phone_number {
-   display: block;
-   margin: 5px 0;
-   width: 100%;
-  }
-  .new_contact .form__label .label__icon {
-   filter: invert(1);
-   height: 20px;
-   width: 20px;
-   margin: 0 5px;
-  }
-  .new_contact .btn:focus-visible {
-   outline: 1px solid #fff;
-  }
-  .new_contact .btn--green {
-   background-color: #4c939a;
-  }
-  .new_contact .btn--green:hover {
-   background-color: #00d689;
-  }
-  .new_contact .form__input {
-   background-color: rgba(255, 255, 255, 0.2);
-   border: none;
-   border-radius: calc(10px / 2);
-   color: #fff;
-   font-size: 1rem;
-   padding: 5px;
-   transition: 0.3s;
-  }
-  .new_contact .form__input:focus {
-   border: 1.5px solid #00d689;
-   outline: none;
-   line-height: 1.5rem;
-   transition: 0.3s;
-  }
-  .contact-list {
-   width: 100%;
-  }
-  .contact-list .table {
-   border-collapse: collapse;
-   border-radius: 10px;
-   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-   margin: 30px 0;
-   overflow: hidden;
-   width: 100%;
-  }
-  .contact-list .table .table__head__txt,
-  .contact-list .table .table__row {
-   background-color: rgba(255, 255, 255, 0.2);
-   color: #fff;
-   padding: 10px;
-   width: min-content;
-  }
-  .contact-list .table .table__head .table__head__txt {
-   background-color: #55608f;
-   text-align: left;
-  }
-  .contact-list .table .table__body .table__data:hover {
-   background-color: rgba(255, 255, 255, 0.08);
-  }
-  .contact-list .table .table__body .table__data {
-   padding: 10px;
-   position: relative;
-   text-align: left;
-   width: max-content;
-  }
-  .contact-list .table .table__body .table__data:hover {
-   background-color: rgba(255, 255, 255, 0.35);
-   font-weight: 600;
-   /* background-color: rgba(85, 96, 143, 0.15); */
-  }
-  .contact-list .table .table__body .table__data:hover:before {
-   content: "";
-   background-color: rgba(255, 255, 255, 0.08);
-   position: absolute;
-   left: 0;
-   right: 0;
-   top: -9999px;
-   bottom: -9999px;
-   z-index: -1;
-  }
-  .contact-list .table .table__body .table__data--name {
-   max-width: 130px;
-  }
-  .contact-list .table .table__body .table__data--options {
-   display: flex;
-   gap: 10px;
-   justify-content: space-evenly;
-   width: 100%;
-  }
-
-  .table__data--options:hover {
-   background-color: transparent !important;
-  }
-
-  .table__data--options:hover:before {
-   pointer-events: none !important;
-   background-color: transparent !important;
-  }
-
-  .contact-list .table .btn--edit,
-  .contact-list .table .btn--delete {
-   background-color: rgba(255, 255, 255, 0);
-   border: none;
-   border-radius: 50%;
-  }
-  .contact-list .table .btn--edit:hover,
-  .contact-list .table .btn--delete:hover {
-   cursor: pointer;
-  }
-  .contact-list .table .btn--edit svg,
-  .contact-list .table .btn--delete svg {
-   border-radius: 50%;
-   background-color: rgba(255, 255, 255, 0);
-   transition: 0.3s;
-  }
-  .contact-list .table .btn--edit svg:hover,
-  .contact-list .table .btn--delete svg:hover {
-   transform: scale(1.15);
-   ctransition: 0.3s;
-  }
-  .contact-list .table .btn--edit path {
-   fill: #cfff04;
-  }
-  .contact-list .table .btn--delete path {
-   fill: #d65656;
-  }
- </style> -->
  <script src="https://cdn.jsdelivr.net/npm/less@4.1.1"></script>
  <!-- The Less CDN has to be placed after the <style> tag for it to work. -->
 
@@ -710,6 +471,14 @@
      contact_list: [],
      id_cont: 0,
 
+     nameIsEmpty: true,
+     nameIsWrong: false,
+     nameIsCorrect: false,
+
+     numberIsEmpty: true,
+     numberIsWrong: false,
+     numberIsCorrect: false,
+
      new_name: {
       name: "",
       error: false,
@@ -717,6 +486,7 @@
      },
      new_number: {
       number: "",
+      backupNumber: "",
       error: false,
       error_msg: "",
       special: false,
@@ -739,77 +509,55 @@
     new_name: {
      handler() {
       this.checkName();
+      this.nameClassesToggle();
      },
      deep: true,
     },
     new_number: {
      handler() {
       this.checkNumber();
-      this.numberMask();
+      // this.addNumberMask();
       this.checkIsSpecial();
+      this.numberClassesToggle();
      },
      deep: true,
     },
    },
    methods: {
-    numberMask() {
+    newNumberInput() {
+     this.doNumberBackup();
+     this.addNumberMask();
+    },
+    doNumberBackup() {
+     this.new_number.backupNumber = this.new_number.number;
+    },
+    addNumberMask() {
      this.new_number.number = this.new_number.number
       .replace(/[^0-9]/g, "")
       .replace(/^(\d{2})?(\d{5})?(\d{4})?/g, "($1) $2-$3")
       .substr(0, 15);
     },
-    toggleBtn() {
-     if (this.show_add_btn) {
-      this.updateShowForm(true, true);
-      this.show_add_btn = false;
+    nameClassesToggle() {
+     // Vou precisar de pelo menos 2 variáveis...
+     if (this.new_name.name === "") {
+      this.nameIsEmpty = true;
+      this.nameIsCorrect = false;
+      this.nameIsWrong = false;
      } else {
-      this.updateShowForm(true, false);
-      this.show_add_btn = true;
+      this.nameIsCorrect = !this.new_name.error;
+      this.nameIsWrong = this.new_name.error;
      }
     },
-    updateShowForm(imperative, value) {
-     if (imperative) {
-      this.show_form = value;
+    numberClassesToggle() {
+     // Vou precisar de pelo menos 2 variáveis...
+     if (this.new_number.number === "") {
+      this.numberIsEmpty = true;
+      this.numberIsCorrect = false;
+      this.numberIsWrong = false;
      } else {
-      if (this.contact_list.length) this.show_form = false;
-      else this.show_form = true;
+      this.numberIsCorrect = !this.new_number.error;
+      this.numberIsWrong = this.new_number.error;
      }
-    },
-    updateShowList(imperative, value) {
-     if (imperative) {
-      this.show_list = value;
-     } else {
-      if (this.contact_list.length > 0) this.show_list = true;
-      else this.show_list = false;
-     }
-    },
-    updateLocalStorage(action) {
-     if (action === "get") {
-      const json_contact_list = localStorage.getItem("contact_list");
-      this.contact_list = JSON.parse(json_contact_list) || [];
-     }
-     if (action === "set") {
-      localStorage.setItem("contact_list", JSON.stringify(this.contact_list));
-     }
-    },
-    addContact() {
-     if (this.checkName() && this.checkNumber()) {
-      var contact = {};
-      contact["id"] = this.id_cont;
-      contact["name"] = this.new_name.name;
-      contact["number"] = this.new_number.number;
-      contact["special"] = this.new_number.special;
-
-      this.contact_list.push(contact);
-      this.resetForm();
-      this.id_cont++;
-      this.show_add_btn = true;
-     }
-    },
-    resetForm() {
-     document.getElementById("contact_form").reset();
-     this.resetNewName();
-     this.resetNewNumber();
     },
     resetNewName() {
      this.new_name.name = "";
@@ -826,7 +574,9 @@
       //  Doesn't accept space at the end
       var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
       var teste = regex.test(this.new_name.name);
-      console.log(teste);
+
+      console.log(`test - ${teste} | error = ${this.new_name.error}`);
+
       if (teste) {
        this.new_name.error = false;
        return true;
@@ -862,6 +612,62 @@
       this.new_number.error = true;
       this.new_number.error_msg = msg;
      }
+    },
+    disableNumberMask() {
+     this.new_number.number = this.new_number.backupNumber;
+    },
+    addContact() {
+     if (this.checkName() && this.checkNumber()) {
+      var contact = {};
+      contact["id"] = this.id_cont;
+      contact["name"] = this.new_name.name;
+      contact["number"] = this.new_number.number;
+      contact["special"] = this.new_number.special;
+
+      this.contact_list.push(contact);
+      this.resetForm();
+      this.id_cont++;
+      this.show_add_btn = true;
+     }
+    },
+    updateLocalStorage(action) {
+     if (action === "get") {
+      const json_contact_list = localStorage.getItem("contact_list");
+      this.contact_list = JSON.parse(json_contact_list) || [];
+     }
+     if (action === "set") {
+      localStorage.setItem("contact_list", JSON.stringify(this.contact_list));
+     }
+    },
+    toggleBtn() {
+     if (this.show_add_btn) {
+      this.updateShowForm(true, true);
+      this.show_add_btn = false;
+     } else {
+      this.updateShowForm(true, false);
+      this.show_add_btn = true;
+     }
+    },
+    updateShowForm(imperative, value) {
+     if (imperative) {
+      this.show_form = value;
+     } else {
+      if (this.contact_list.length) this.show_form = false;
+      else this.show_form = true;
+     }
+    },
+    updateShowList(imperative, value) {
+     if (imperative) {
+      this.show_list = value;
+     } else {
+      if (this.contact_list.length > 0) this.show_list = true;
+      else this.show_list = false;
+     }
+    },
+    resetForm() {
+     document.getElementById("contact_form").reset();
+     this.resetNewName();
+     this.resetNewNumber();
     },
     editContact() {},
     deleteContact(index, event) {
