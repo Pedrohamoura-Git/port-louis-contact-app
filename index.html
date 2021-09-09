@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+ <head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/less@4.1.1"></script> -->
+  <!-- <link
+   rel="stylesheet"
+   href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+   integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
+   crossorigin="anonymous"
+  /> -->
+  <script
+   src="https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js"
+   integrity="sha512-EoQC7ZpFBwvZEbXQeelA6VpL75iUn484CsQX3qqOa27UmBMdFxsQ8ZwX1v0437BOND6fcuH+t/NL1DeQGKcyiw=="
+   crossorigin="anonymous"
+   referrerpolicy="no-referrer"
+  ></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.2.1"></script>
+  <script src="https://unpkg.com/vue-router@3.5.2/dist/vue-router.js"></script>
+  <title>Contact app</title>
+ </head>
+
+ <body>
+  <div id="app">
+   <div class="wrapper">
+    <button v-if="show_add_btn" class="btn btn--add" @click="toggleBtn()">+</button>
+    <button v-else class="btn btn--close" @click="toggleBtn()">x</button>
+
+    <div v-if="show_form" class="new_contact">
+     <form action="#" class="form" id="contact_form">
+      <h2 class="block__title">Adicione um novo contato</h2>
+      <label for="new__name" class="form__label">
+       <img
+        class="label__icon"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAuODIyIDE4LjA5NmMtMy40MzktLjc5NC02LjY0LTEuNDktNS4wOS00LjQxOCA0LjcyLTguOTEyIDEuMjUxLTEzLjY3OC0zLjczMi0xMy42NzgtNS4wODIgMC04LjQ2NCA0Ljk0OS0zLjczMiAxMy42NzggMS41OTcgMi45NDUtMS43MjUgMy42NDEtNS4wOSA0LjQxOC0zLjA3My43MS0zLjE4OCAyLjIzNi0zLjE3OCA0LjkwNGwuMDA0IDFoMjMuOTlsLjAwNC0uOTY5Yy4wMTItMi42ODgtLjA5Mi00LjIyMi0zLjE3Ni00LjkzNXoiLz48L3N2Zz4="
+       />
+       <input
+        class="form__input"
+        type="text"
+        id="new__name"
+        placeholder="Nome"
+        v-model="new_name.name"
+        @input="new_name.error = false "
+        @blur="checkName()"
+        required="required"
+       />
+      </label>
+      <div v-if="new_name.error" class="input_error">{{new_name.error_msg}}</div>
+
+      <label for="new__phone_number" class="form__label">
+       <img
+        class="label__icon"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAgMjIuNjIxbC0zLjUyMS02Ljc5NWMtLjAwOC4wMDQtMS45NzQuOTctMi4wNjQgMS4wMTEtMi4yNCAxLjA4Ni02Ljc5OS03LjgyLTQuNjA5LTguOTk0bDIuMDgzLTEuMDI2LTMuNDkzLTYuODE3LTIuMTA2IDEuMDM5Yy03LjIwMiAzLjc1NSA0LjIzMyAyNS45ODIgMTEuNiAyMi42MTUuMTIxLS4wNTUgMi4xMDItMS4wMjkgMi4xMS0xLjAzM3oiLz48L3N2Zz4="
+       />
+
+       <input
+        class="form__input"
+        type="tel"
+        id="new__phone_number"
+        placeholder="telefone"
+        v-model="new_number.number"
+        @blur="checkNumber()"
+        required
+       />
+      </label>
+      <div v-if="new_number.error" class="input_error">{{new_number.error_msg}}</div>
+
+      <div class="form__options">
+       <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
+       <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
+      </div>
+     </form>
+    </div>
+
+    <div v-if="show_list" class="contact-list">
+     <h2 class="block__title">Seus contatos</h2>
+     <table class="table">
+      <thead class="table__head">
+       <th class="table__head__txt">Nome</th>
+       <th class="table__head__txt">Número</th>
+       <th class="table__head__txt">Opções</th>
+      </thead>
+      <tbody class="table__body">
+       <tr v-for="(item, index) in contact_list" :key="item.id" class="table__row" :class="{special: item.special}">
+        <td class="table__data table__data--name">{{item.name}}</td>
+        <td class="table__data table__data--number">{{item.number}}</td>
+        <td class="table__data table__data--options">
+         <button class="btn--edit" @click="editContact()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+           <path
+            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-3.994 12.964l3.106 3.105-4.112.931 1.006-4.036zm9.994-3.764l-5.84 5.921-3.202-3.202 5.841-5.919 3.201 3.2z"
+           />
+          </svg>
+         </button>
+         <button class="btn--delete" @click="deleteContact(index, $event)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+           <path
+            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z"
+           />
+          </svg>
+         </button>
+        </td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </div>
+  </div>
+ </body>
+
+ <style type="text/less">
+  @import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,600;0,900;1,400;1,600;1,900&display=swap");
+
+  @bg-color-btn-add: #4C939A;
+  @bg-color-btn-add-hover: #00d689;
+  @bg-color-btn-clear: 255, 255, 255;
+  @bg-color-btn-clear-hover: 255, 255, 255;
+  @bg-color-btn-close-delete: #d65656;
+  @bg-color-card: #f9f2e7;
+  @bg-color-error: #F6AA93;
+  @bg-color-thead: #517ACB;
+  /* @bg-color-thead: #55608F; */
+  @bg-rbg-color-table: 255, 255, 255;
+  @border-radius-small: 10px;
+  @border-radius-very-small: calc(@border-radius-small / 2);
+  @box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  @margin-tb-3: 30px 0;
+  @padding-small: 10px;
+  @transition-time-quick: .3s;
+  @txt-color-header: #fff;
+  @txt-color: #fff;
+  @txt-color-error: #8C233E;
+
+  * {
+   box-sizing: border-box;
+   font-family: "Urbanist", Helvetica, sans-serif;
+   letter-spacing: 1.5px;
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+  }
+
+  body {
+   background: linear-gradient(21deg, #49a09d, #5f2c82);
+  }
+
+  #app {
+   color: @txt-color;
+   display: flex;
+   height: 100vh;
+   justify-content: center;
+   margin: 8vh 0;
+  }
+
+  .wrapper {
+   display: flex;
+   align-items: center;
+   flex-direction: column;
+   margin: 0 auto;
+   position: relative;
+   width: 90%;
+  }
+
+  .block__title {
+   color: @txt-color-header;
+   font-size: 1.8rem;
+   margin: 21px 0;
+   text-align: center;
+  }
+
+  .btn {
+   border: none;
+   border-radius: @border-radius-very-small;
+   padding: 7px 12px;
+   transition: @transition-time-quick;
+   width: max-content;
+   text-align: center;
+   text-transform: none;
+
+   &:hover {
+    cursor: pointer;
+    transition: @transition-time-quick;
+   }
+
+   &--green {
+    background-color: @bg-color-btn-add;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 10px auto;
+    width: 60%;
+
+    &:hover {
+     background-color: @bg-color-btn-add-hover;
+    }
+
+    &:focus-visible {
+     outline: 1px solid @txt-color;
+    }
+   }
+
+   &--clear {
+    background-color: rgba(@bg-color-btn-clear, 0.7);
+    color: black;
+    font-weight: 600;
+    height: 31px;
+    padding: 5px 15px;
+
+    &:hover {
+     background-color: rgba(@bg-color-btn-clear-hover, 1);
+    }
+   }
+
+   &--add,
+   &--close {
+    color: white;
+    font-size: 1.5rem;
+    position: fixed;
+    top: 10px;
+    right: 21px;
+   }
+
+   &--add {
+    background-color: @bg-color-btn-add-hover;
+   }
+
+   &--close {
+    background-color: @bg-color-btn-close-delete;
+   }
+
+   &--edit,
+   &--delete {
+    background-color: rgba(@bg-rbg-color-table, 0);
+    border: none;
+    border-radius: 50%;
+
+    &:hover {
+     cursor: pointer;
+    }
+
+    svg {
+     border-radius: 50%;
+     background-color: rgba(@bg-rbg-color-table, 0);
+     transition: @transition-time-quick;
+
+     &:hover {
+      transform: scale(1.15);
+      transition: @transition-time-quick;
+     }
+    }
+   }
+
+   &--edit {
+    path {
+     fill: #cfff04;
+    }
+   }
+
+   &--delete {
+    path {
+     fill: @bg-color-btn-close-delete;
+    }
+   }
+  }
+
+  /**************************
+  ** Common classes
+  **************************/
+
+  /**************************
+  ** New contact form
+  **************************/
+  .new_contact {
+   transition: @transition-time-quick;
+   width: 100%;
+
+   .form {
+    box-shadow: @box-shadow;
+    border-radius: @border-radius-small;
+    display: flex;
+    flex-direction: column;
+    padding: @padding-small;
+    width: 100%;
+
+    &__title {
+     text-align: center;
+    }
+
+    &__label {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     margin: 3px 0;
+
+     .form__input {
+      padding: @padding-small;
+     }
+
+     #new__name,
+     #new__phone_number {
+      display: block;
+      margin: 5px 0;
+      width: 100%;
+     }
+
+     .label__icon {
+      filter: invert(1);
+      height: 20px;
+      width: 20px;
+      margin: 0 5px;
+     }
+    }
+
+    .input_error {
+     align-self: flex-end;
+     background-color: @bg-color-error;
+     border-radius: @border-radius-very-small;
+     color: @txt-color-error;
+     padding: @padding-small;
+     text-align: center;
+     transition: @transition-time-quick;
+     width: 90%;
+    }
+
+    &__options {
+     display: flex;
+     align-items: center;
+    }
+   }
+
+   .form__input {
+    background-color: rgba(@bg-rbg-color-table, 0.2);
+    border: none;
+    border-radius: @border-radius-very-small;
+    color: @txt-color;
+    font-size: 1rem;
+    padding: 5px;
+    transition: @transition-time-quick;
+
+    &:focus {
+     border: 1.5px solid @bg-color-btn-add-hover;
+     outline: none;
+     line-height: 1.5rem;
+     transition: @transition-time-quick;
+    }
+   }
+  }
+
+  /**************************
+    ** Contact list
+    **************************/
+  .contact-list {
+   width: 100%;
+
+   .special {
+    background-color: @bg-color-thead !important;
+   }
+
+   .table {
+    border-collapse: collapse;
+    border-radius: @border-radius-small;
+    box-shadow: @box-shadow;
+    margin: @margin-tb-3;
+    overflow: hidden;
+    width: 100%;
+
+    .table__head__txt,
+    .table__row {
+     background-color: rgba(@bg-rbg-color-table, 0.2);
+     color: #fff;
+     padding: @padding-small;
+     width: min-content;
+    }
+
+    .table__head {
+     .table__head__txt {
+      background-color: @bg-color-thead;
+      text-align: left;
+     }
+    }
+
+    .table__body {
+     .table__data {
+      &:hover {
+       background-color: rgba(@bg-rbg-color-table, 0.08);
+      }
+     }
+
+     .table__data {
+      font-weight: 600;
+      padding: @padding-small;
+      position: relative;
+      text-align: left;
+      width: max-content;
+
+      &:hover {
+       background-color: rgba(@bg-rbg-color-table, 0.1);
+
+       &:before {
+        content: "";
+        background-color: rgba(@bg-rbg-color-table, 0.08);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -9999px;
+        bottom: -9999px;
+        z-index: -1;
+       }
+      }
+
+      &--name {
+       max-width: 130px;
+      }
+
+      &--options {
+       display: flex;
+       gap: 10px;
+       justify-content: space-evenly;
+       width: 100%;
+
+       &:hover {
+        background-color: transparent !important;
+       }
+
+       &:hover:before {
+        pointer-events: none !important;
+        background-color: transparent !important;
+       }
+      }
+     }
+    }
+
+    /* .btn--edit,
+      .btn--delete {
+       background-color: rgba(@bg-rbg-color-table, 0);
+       border: none;
+       border-radius: 50%;
+
+       &:hover {
+        cursor: pointer;
+       }
+
+       svg {
+        border-radius: 50%;
+        background-color: rgba(@bg-rbg-color-table, 0);
+        transition: @transition-time-quick;
+
+        &:hover {
+         transform: scale(1.15);c
+         transition: @transition-time-quick;
+        }
+       }
+      }
+
+      .btn--edit {
+       path {
+        fill: #cfff04;
+       }
+      }
+
+      .btn--delete {
+       path {
+        fill: @bg-color-btn-close-delete;
+       }
+      } */
+   }
+  }
+ </style>
+
+ <!-- CSS  -->
+ <!-- <style type="text/less">
+  @import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,600;0,900;1,400;1,600;1,900&display=swap");
+
+  @bg-color-btn-add: #4C939A;
+  @bg-color-btn-add-hover: #00d689;
+  @bg-color-card: #f9f2e7;
+  @bg-color-error: #F6AA93;
+  @bg-color-thead: #55608F;
+  @bg-rbg-color-table: 255, 255, 255;
+  @border-radius-small: 10px;
+  @border-radius-very-small: calc(@border-radius-small / 2);
+  @box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  @margin-tb-3: 30px 0;
+  @padding-small: 10px;
+  @transition-time-quick: .3s;
+  @txt-color-header: #fff;
+  @txt-color: #fff;
+  @txt-color-error: #8C233E;
+
+  * {
+   box-sizing: border-box;
+   font-family: "Urbanist", Helvetica, sans-serif;
+   letter-spacing: 1.5px;
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+  }
+  body {
+   /* background-image: url(http://www.jotform.com/uploads/eee/form_files/blurry-gaussian_00420663.jpg); */
+   background: linear-gradient(21deg, #49a09d, #5f2c82);
+  }
+  #app {
+   color: #fff;
+   display: flex;
+   height: 100vh;
+   justify-content: center;
+   margin: 8vh 0;
+  }
+  .wrapper {
+   display: flex;
+   align-items: center;
+   flex-direction: column;
+   margin: 0 auto;
+   width: 90%;
+  }
+  .block__title {
+   color: #fff;
+   font-size: 1.8rem;
+   margin: 21px 0;
+   text-align: center;
+  }
+  .btn {
+   border: none;
+   border-radius: calc(10px / 2);
+   color: #ffffff;
+   font-size: 14px;
+   font-weight: 600;
+   margin: 10px auto;
+   padding: 7px 12px;
+   text-transform: uppercase;
+   width: 60%;
+   transition: 0.3s;
+  }
+  .btn:hover {
+   cursor: pointer;
+   transform: scale(1.02);
+   transition: 0.3s;
+  }
+  .btn:focus-visible {
+   outline: 1px solid #fff;
+  }
+  .input_error {
+   align-self: flex-end;
+   background-color: #f6aa93;
+   border-radius: calc(10px / 2);
+   color: #8c233e;
+   padding: 10px;
+   text-align: center;
+   transition: 0.3s;
+   width: 90%;
+  }
+  .new_contact {
+   transition: 0.3s;
+   width: 100%;
+  }
+  .new_contact .form {
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+   border-radius: 10px;
+   display: flex;
+   flex-direction: column;
+   padding: 10px;
+   width: 100%;
+  }
+  .new_contact .form__title {
+   text-align: center;
+  }
+  .new_contact .form__label {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   margin: 3px 0;
+  }
+  .new_contact .form__label .form__input {
+   padding: 10px;
+  }
+  .new_contact .form__label #new__name,
+  .new_contact .form__label #new__phone_number {
+   display: block;
+   margin: 5px 0;
+   width: 100%;
+  }
+  .new_contact .form__label .label__icon {
+   filter: invert(1);
+   height: 20px;
+   width: 20px;
+   margin: 0 5px;
+  }
+  .new_contact .btn:focus-visible {
+   outline: 1px solid #fff;
+  }
+  .new_contact .btn--green {
+   background-color: #4c939a;
+  }
+  .new_contact .btn--green:hover {
+   background-color: #00d689;
+  }
+  .new_contact .form__input {
+   background-color: rgba(255, 255, 255, 0.2);
+   border: none;
+   border-radius: calc(10px / 2);
+   color: #fff;
+   font-size: 1rem;
+   padding: 5px;
+   transition: 0.3s;
+  }
+  .new_contact .form__input:focus {
+   border: 1.5px solid #00d689;
+   outline: none;
+   line-height: 1.5rem;
+   transition: 0.3s;
+  }
+  .contact-list {
+   width: 100%;
+  }
+  .contact-list .table {
+   border-collapse: collapse;
+   border-radius: 10px;
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+   margin: 30px 0;
+   overflow: hidden;
+   width: 100%;
+  }
+  .contact-list .table .table__head__txt,
+  .contact-list .table .table__row {
+   background-color: rgba(255, 255, 255, 0.2);
+   color: #fff;
+   padding: 10px;
+   width: min-content;
+  }
+  .contact-list .table .table__head .table__head__txt {
+   background-color: #55608f;
+   text-align: left;
+  }
+  .contact-list .table .table__body .table__data:hover {
+   background-color: rgba(255, 255, 255, 0.08);
+  }
+  .contact-list .table .table__body .table__data {
+   padding: 10px;
+   position: relative;
+   text-align: left;
+   width: max-content;
+  }
+  .contact-list .table .table__body .table__data:hover {
+   background-color: rgba(255, 255, 255, 0.35);
+   font-weight: 600;
+   /* background-color: rgba(85, 96, 143, 0.15); */
+  }
+  .contact-list .table .table__body .table__data:hover:before {
+   content: "";
+   background-color: rgba(255, 255, 255, 0.08);
+   position: absolute;
+   left: 0;
+   right: 0;
+   top: -9999px;
+   bottom: -9999px;
+   z-index: -1;
+  }
+  .contact-list .table .table__body .table__data--name {
+   max-width: 130px;
+  }
+  .contact-list .table .table__body .table__data--options {
+   display: flex;
+   gap: 10px;
+   justify-content: space-evenly;
+   width: 100%;
+  }
+
+  .table__data--options:hover {
+   background-color: transparent !important;
+  }
+
+  .table__data--options:hover:before {
+   pointer-events: none !important;
+   background-color: transparent !important;
+  }
+
+  .contact-list .table .btn--edit,
+  .contact-list .table .btn--delete {
+   background-color: rgba(255, 255, 255, 0);
+   border: none;
+   border-radius: 50%;
+  }
+  .contact-list .table .btn--edit:hover,
+  .contact-list .table .btn--delete:hover {
+   cursor: pointer;
+  }
+  .contact-list .table .btn--edit svg,
+  .contact-list .table .btn--delete svg {
+   border-radius: 50%;
+   background-color: rgba(255, 255, 255, 0);
+   transition: 0.3s;
+  }
+  .contact-list .table .btn--edit svg:hover,
+  .contact-list .table .btn--delete svg:hover {
+   transform: scale(1.15);
+   ctransition: 0.3s;
+  }
+  .contact-list .table .btn--edit path {
+   fill: #cfff04;
+  }
+  .contact-list .table .btn--delete path {
+   fill: #d65656;
+  }
+ </style> -->
+ <script src="https://cdn.jsdelivr.net/npm/less@4.1.1"></script>
+ <!-- The Less CDN has to be placed after the <style> tag for it to work. -->
+
+ <script>
+  const app = Vue.createApp({
+   data() {
+    return {
+     show_form: true,
+     show_list: false,
+     show_add_btn: true,
+     contact_list: [],
+     id_cont: 0,
+
+     new_name: {
+      name: "",
+      error: false,
+      error_msg: "",
+     },
+     new_number: {
+      number: "",
+      error: false,
+      error_msg: "",
+      special: false,
+     },
+    };
+   },
+   created() {
+    this.updateLocalStorage("get");
+   },
+   computed: {},
+   watch: {
+    contact_list: {
+     handler() {
+      this.updateLocalStorage("set");
+      this.updateShowForm();
+      this.updateShowList();
+     },
+     deep: true,
+    },
+    new_name: {
+     handler() {
+      if (this.new_number.number !== "") {
+       if (/^([a-zA-Z -]{2,}\s[a-zA-z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)/) {
+        this.new_number.error = true;
+       }
+      }
+     },
+     deep: true,
+    },
+    new_number: {
+     handler() {
+      this.numberMask();
+      this.checkIsSpecial();
+     },
+     deep: true,
+    },
+   },
+   methods: {
+    numberMask() {
+     this.new_number.number = this.new_number.number
+      .replace(/[^0-9]/g, "")
+      .replace(/^(\d{2})?(\d{5})?(\d{4})?/g, "($1) $2-$3")
+      .substr(0, 15);
+    },
+    toggleBtn() {
+     if (this.show_add_btn) {
+      this.updateShowForm(true, true);
+      this.show_add_btn = false;
+     } else {
+      this.updateShowForm(true, false);
+      this.show_add_btn = true;
+     }
+    },
+    updateShowForm(imperative, value) {
+     if (imperative) {
+      this.show_form = value;
+     } else {
+      if (this.contact_list.length) this.show_form = false;
+      else this.show_form = true;
+     }
+    },
+    updateShowList(imperative, value) {
+     if (imperative) {
+      this.show_list = value;
+     } else {
+      if (this.contact_list.length > 0) this.show_list = true;
+      else this.show_list = false;
+     }
+    },
+    updateLocalStorage(action) {
+     if (action === "get") {
+      const json_contact_list = localStorage.getItem("contact_list");
+      this.contact_list = JSON.parse(json_contact_list) || [];
+     }
+     if (action === "set") {
+      localStorage.setItem("contact_list", JSON.stringify(this.contact_list));
+     }
+    },
+    addContact() {
+     if (this.checkName() && this.checkNumber()) {
+      var contact = {};
+      contact["id"] = this.id_cont;
+      contact["name"] = this.new_name.name;
+      contact["number"] = this.new_number.number;
+      contact["special"] = this.new_number.special;
+
+      this.contact_list.push(contact);
+      this.resetForm();
+      this.id_cont++;
+      // this.show_add_btn = true;
+     }
+    },
+    resetForm() {
+     document.getElementById("contact_form").reset();
+     this.resetNewName();
+     this.resetNewNumber();
+    },
+    resetNewName() {
+     this.new_name.name = "";
+     this.new_name.error = false;
+     this.new_name.error_msg = "";
+    },
+    resetNewNumber() {
+     this.new_number.number = "";
+     this.new_number.error = false;
+     this.new_number.error_msg = "";
+    },
+    checkName() {
+     var msg;
+     var time = 8000;
+     if (!this.new_name.name.includes(" ")) {
+      msg = "O nome precisa ter no mínimo duas palavras de no mínimo 3 letras cada.";
+      this.showError("new_name", msg, time);
+      return false;
+     }
+     if (this.new_name.name === "") {
+      msg = "Preecha o nome.";
+      time = 4000;
+      this.showError("new_name", msg, time);
+      return false;
+     } else return true;
+    },
+    checkNumber() {
+     var number = this.new_number.number;
+     var time = 5000;
+     var msg;
+     if (number !== "" && number.length < 15) {
+      msg = "Preecha o telefone corretamente.";
+      this.showError("new_number", msg, time);
+      return false;
+     } else return true;
+    },
+    checkIsSpecial() {
+     if (this.new_number.number.includes("(11) ")) {
+      this.new_number.special = true;
+     } else {
+      this.new_number.special = false;
+     }
+    },
+    showError(elem, msg, time) {
+     if (elem === "new_name") {
+      this.new_name.error = true;
+      this.new_name.error_msg = msg;
+     }
+     if (elem === "new_number") {
+      this.new_number.error = true;
+      this.new_number.error_msg = msg;
+     }
+     setTimeout(() => {
+      if (elem === "new_name") this.new_name.error = false;
+      if (elem === "new_number") this.new_number.error = false;
+     }, time);
+    },
+    editContact() {},
+    deleteContact(index, event) {
+     if (confirm("Você tem certeza?")) {
+      this.contact_list.splice(index, 1);
+     }
+    },
+   },
+  });
+
+  app.mount("#app");
+ </script>
+
+ <!-- Vue Instance and Routes -->
+ <!-- <script>
+  var routes = [
+   // { path: '/', component: Home },
+   // { path: '/about', component: About },
+   // { path: '/contact', component: Contact }
+  ];
+
+  var router = new VueRouter({
+   routes: routes,
+   mode: "history",
+   base: "/",
+  });
+
+  var app = new Vue({
+   el: "#app",
+   router: router,
+  });
+ </script> -->
+</html>
