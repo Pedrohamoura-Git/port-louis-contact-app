@@ -125,8 +125,9 @@
         @input="modNameInput($event)"
         required="required"
        />
-       <!-- v-if="nameIsWrong" -->
-       <span v-if="nameIsWrong" class="btn--warning_info" @click="nameToggleErrorMsg()">
+
+       <!-- Error icon  -->
+       <span v-if="this.editForm.modNameError" class="btn--warning_info" @click="toggleModNameErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -134,8 +135,9 @@
         </svg>
        </span>
       </label>
-      <!-- ERROR MSG NAME -->
-      <div v-if="new_name.show_error_msg" class="error_card">{{new_name.error_msg}}</div>
+
+      <!-- ERROR MSG MOD Name-->
+      <div v-if="this.editForm.showModNameErrorMsg" class="error_card">{{this.editForm.modNameErrorMsg}}</div>
       <!-- ERROR MSG  -->
 
       <label for="mod__phone_number" class="form__label">
@@ -147,9 +149,9 @@
        <input
         class="form__input"
         :class="[
-         {'': numberIsEmpty}, 
-         {'form__input--error': numberIsWrong},
-         {'form__input--correct': numberIsCorrect}]"
+        {'': nameIsEmpty}, 
+        {'form__input--error': this.editForm.modNumberError},
+        {'form__input--correct': !this.editForm.modNumberError}]"
         type="tel"
         id="mod__phone_number"
         placeholder="telefone"
@@ -158,7 +160,7 @@
         required="required"
        />
        <!-- v-if="numberIsWrong" -->
-       <span v-if="numberIsWrong" class="btn--warning_info" @click="numberToggleErrorMsg()">
+       <span v-if="this.editForm.modNumberError" class="btn--warning_info" @click="toggleModNumberErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -166,8 +168,8 @@
         </svg>
        </span>
       </label>
-      <!-- ERROR MSG  NUMBER-->
-      <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}}</div>
+      <!-- ERROR MSG MOD NUMBER-->
+      <div v-if="this.editForm.showModNumberErrorMsg" class="error_card">{{this.editForm.modNumberErrorMsg}}</div>
       <!-- ERROR MSG  -->
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact()">Modificar</button>
@@ -585,8 +587,12 @@
       index: "",
       modName: "",
       modNameError: false,
+      showModNameErrorMsg: false,
+      modNameErrorMsg: "rwar",
       modNumber: "",
       modNumberError: false,
+      showModNumberErrorMsg: false,
+      modNumberErrorMsg: "djklaw",
       special: "",
      },
 
@@ -870,6 +876,9 @@
       this.updateErrorMsg(elem, msg);
      }
     },
+    toggleModNameErrorMsg() {
+     this.editForm.showModNameErrorMsg = !this.editForm.showModNameErrorMsg;
+    },
 
     // MOD NUMBER FUNCTIONS
     modNumberInput(e) {
@@ -881,7 +890,7 @@
     checkModNumber() {
      var modNumber = this.editForm.modNumber;
      var msg;
-     if (modNumber !== "" && modNumber.length < 14) {
+     if (modNumber.length < 14) {
       msg = "Preecha o telefone corretamente.";
       this.editForm.modNumberError = true;
       this.updateErrorMsg("modNumber", msg);
@@ -903,6 +912,9 @@
      } else {
       this.editForm.special = false;
      }
+    },
+    toggleModNumberErrorMsg() {
+     this.editForm.showModNumberErrorMsg = !this.editForm.showModNumberErrorMsg;
     },
     deleteContact(index, event) {
      if (confirm("Você tem certeza?")) {
