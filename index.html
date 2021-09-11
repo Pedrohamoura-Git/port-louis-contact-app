@@ -29,8 +29,8 @@
    <div class="wrapper">
     <button v-if="show_add_btn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
     <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button>
-    <!-- v-if="show_form" -->
-    <div class="new_contact">
+
+    <div v-if="show_form" class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
 
@@ -60,8 +60,8 @@
         </svg>
        </span>
       </label>
-      <!-- ERROR MSG  -->
-      <div v-if="new_name.show_error_msg" class="error_card">{{new_name.error_msg}}12321312</div>
+      <!-- ERROR MSG NAME -->
+      <div v-if="new_name.show_error_msg" class="error_card">{{new_name.error_msg}}</div>
       <!-- ERROR MSG  -->
 
       <label for="new__phone_number" class="form__label">
@@ -93,12 +93,85 @@
         </svg>
        </span>
       </label>
-      <!-- ERROR MSG  -->
-      <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}} | Teste</div>
+      <!-- ERROR MSG  NUMBER-->
+      <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}}</div>
       <!-- ERROR MSG  -->
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
        <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
+      </div>
+     </form>
+    </div>
+
+    <div v-if="showEditForm" class="new_contact">
+     <form action="#" class="form" id="edit_Form">
+      <h2 class="block__title">Modifique o contato</h2>
+
+      <label for="mod__name" class="form__label">
+       <img
+        class="label__icon"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAuODIyIDE4LjA5NmMtMy40MzktLjc5NC02LjY0LTEuNDktNS4wOS00LjQxOCA0LjcyLTguOTEyIDEuMjUxLTEzLjY3OC0zLjczMi0xMy42NzgtNS4wODIgMC04LjQ2NCA0Ljk0OS0zLjczMiAxMy42NzggMS41OTcgMi45NDUtMS43MjUgMy42NDEtNS4wOSA0LjQxOC0zLjA3My43MS0zLjE4OCAyLjIzNi0zLjE3OCA0LjkwNGwuMDA0IDFoMjMuOTlsLjAwNC0uOTY5Yy4wMTItMi42ODgtLjA5Mi00LjIyMi0zLjE3Ni00LjkzNXoiLz48L3N2Zz4="
+       />
+       <input
+        class="form__input"
+        type="text"
+        :class="[
+        {'': nameIsEmpty}, 
+        {'form__input--error': this.editForm.modNameError},
+        {'form__input--correct': !this.editForm.modNameError}]"
+        id="mod__name"
+        placeholder="Nome"
+        v-model="editForm.modName"
+        @input="modNameInput($event)"
+        required="required"
+       />
+       <!-- v-if="nameIsWrong" -->
+       <span v-if="nameIsWrong" class="btn--warning_info" @click="nameToggleErrorMsg()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+         <path
+          d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
+         />
+        </svg>
+       </span>
+      </label>
+      <!-- ERROR MSG NAME -->
+      <div v-if="new_name.show_error_msg" class="error_card">{{new_name.error_msg}}</div>
+      <!-- ERROR MSG  -->
+
+      <label for="mod__phone_number" class="form__label">
+       <img
+        class="label__icon"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAgMjIuNjIxbC0zLjUyMS02Ljc5NWMtLjAwOC4wMDQtMS45NzQuOTctMi4wNjQgMS4wMTEtMi4yNCAxLjA4Ni02Ljc5OS03LjgyLTQuNjA5LTguOTk0bDIuMDgzLTEuMDI2LTMuNDkzLTYuODE3LTIuMTA2IDEuMDM5Yy03LjIwMiAzLjc1NSA0LjIzMyAyNS45ODIgMTEuNiAyMi42MTUuMTIxLS4wNTUgMi4xMDItMS4wMjkgMi4xMS0xLjAzM3oiLz48L3N2Zz4="
+       />
+
+       <input
+        class="form__input"
+        :class="[
+         {'': numberIsEmpty}, 
+         {'form__input--error': numberIsWrong},
+         {'form__input--correct': numberIsCorrect}]"
+        type="tel"
+        id="mod__phone_number"
+        placeholder="telefone"
+        v-model="editForm.modNumber"
+        @input="modNumberInput($event)"
+        required="required"
+       />
+       <!-- v-if="numberIsWrong" -->
+       <span v-if="numberIsWrong" class="btn--warning_info" @click="numberToggleErrorMsg()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+         <path
+          d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
+         />
+        </svg>
+       </span>
+      </label>
+      <!-- ERROR MSG  NUMBER-->
+      <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}}</div>
+      <!-- ERROR MSG  -->
+      <div class="form__options">
+       <button class="btn btn--green" @click.prevent="addContact()">Modificar</button>
+       <!-- <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button> -->
       </div>
      </form>
     </div>
@@ -116,7 +189,7 @@
         <td class="table__data table__data--name">{{item.name}}</td>
         <td class="table__data table__data--number">{{item.number}}</td>
         <td class="table__data table__data--options">
-         <button class="btn--edit" @click="editContact()">
+         <button class="btn--edit" @click="toggleEditForm(index)">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
            <path
             d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-3.994 12.964l3.106 3.105-4.112.931 1.006-4.036zm9.994-3.764l-5.84 5.921-3.202-3.202 5.841-5.919 3.201 3.2z"
@@ -350,7 +423,9 @@
      }
 
      #new__name,
-     #new__phone_number {
+     #new__phone_number,
+     #mod__name,
+     #mod__phone_number {
       display: block;
       margin: 5px 0;
       width: 100%;
@@ -415,7 +490,8 @@
    width: 100%;
 
    .special {
-    background-color: @bg-color-thead !important;
+    /* background-color: @bg-color-thead !important; */
+    background: linear-gradient(21deg, #517acb, rgba(@bg-rbg-color-table, 0));
    }
 
    .table {
@@ -502,6 +578,22 @@
   const app = Vue.createApp({
    data() {
     return {
+     //  showEditForm: true,
+     showEditForm: false,
+     editForm: {
+      show_form: false,
+      index: "",
+      modName: "",
+      modNameError: false,
+      modNumber: "",
+      modNumberError: false,
+      special: "",
+     },
+
+     modNameIsEmpty: true,
+     modNameIsWrong: false,
+     modNameIsCorrect: false,
+
      show_form: true,
      show_list: false,
      show_add_btn: true,
@@ -564,27 +656,28 @@
    methods: {
     nameToggleErrorMsg() {
      this.new_name.show_error_msg = !this.new_name.show_error_msg;
-     console.log(this.new_name.show_error_msg);
     },
     numberToggleErrorMsg() {
      this.new_number.show_error_msg = !this.new_number.show_error_msg;
-     console.log(this.new_number.show_error_msg);
     },
     newNumberInput() {
      this.doNumberBackup();
-     this.addNumberMask();
+     this.applyNumberMask();
     },
     doNumberBackup() {
      this.new_number.backupNumber = this.new_number.number;
     },
-    addNumberMask() {
-     this.new_number.number = this.new_number.number
-      .replace(/[^0-9]/g, "")
-      .replace(/^(\d{2})?(\d{5})?(\d{4})?/g, "($1) $2-$3")
-      .substr(0, 15);
+    applyNumberMask() {
+     document.getElementById("new__phone_number").addEventListener("input", (e) => {
+      if (e.inputType !== "deleteContentBackward") {
+       this.new_number.number = this.new_number.number
+        .replace(/[^0-9]/g, "")
+        .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
+        .substr(0, 14);
+      }
+     });
     },
     nameClassesToggle() {
-     // Vou precisar de pelo menos 2 variáveis...
      if (this.new_name.name === "") {
       this.nameIsEmpty = true;
       this.nameIsCorrect = false;
@@ -595,7 +688,6 @@
      }
     },
     numberClassesToggle() {
-     // Vou precisar de pelo menos 2 variáveis...
      if (this.new_number.number === "") {
       this.numberIsEmpty = true;
       this.numberIsCorrect = false;
@@ -604,6 +696,11 @@
       this.numberIsCorrect = !this.new_number.error;
       this.numberIsWrong = this.new_number.error;
      }
+    },
+    resetForm() {
+     document.getElementById("contact_form").reset();
+     this.resetNewName();
+     this.resetNewNumber();
     },
     resetNewName() {
      this.new_name.name = "";
@@ -616,27 +713,30 @@
      this.new_number.error_msg = "";
     },
     checkName() {
+     //  Do accept space at the end
+     //  var regex = /^([a-z]{3,}[\S]*(?=\s|$) ?){2,}$/gim;
+
      if (this.new_name.name !== "") {
       //  Doesn't accept space at the end
       var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
       var teste = regex.test(this.new_name.name);
 
-      console.log(`test - ${teste} | error = ${this.new_name.error}`);
-
       if (teste) {
        this.new_name.error = false;
        return true;
-      } else this.new_name.error = true;
+      } else {
+       this.new_name.error = true;
+       var elem = "new_name";
+       var msg = "Mínimo de 2 palavras. Cada palavra precisa começar com 3 letras.";
+       this.updateErrorMsg(elem, msg);
+      }
      }
      return false;
-
-     //  Do accept space at the end
-     //  var regex = /^([a-z]{3,}[\S]*(?=\s|$) ?){2,}$/gim;
     },
     checkNumber() {
      var number = this.new_number.number;
      var msg;
-     if (number !== "" && number.length < 15) {
+     if (number !== "" && number.length < 14) {
       msg = "Preecha o telefone corretamente.";
       this.new_number.error = true;
       this.updateErrorMsg("new_number", msg);
@@ -662,22 +762,37 @@
       this.new_number.error = true;
       this.new_number.error_msg = msg;
      }
+     if (elem === "modNameError") {
+      this.editForm.modNameError = msg;
+     }
+     if (elem === "modNumberError") {
+      this.editForm.modNumberError = true;
+      this.editForm.modNumberError = msg;
+     }
     },
     disableNumberMask() {
      this.new_number.number = this.new_number.backupNumber;
     },
     addContact() {
-     if (this.checkName() && this.checkNumber()) {
-      var contact = {};
-      contact["id"] = this.id_cont;
-      contact["name"] = this.new_name.name;
-      contact["number"] = this.new_number.number;
-      contact["special"] = this.new_number.special;
+     const index = this.editForm.index;
+     if (index == "") {
+      if (this.checkName() && this.checkNumber()) {
+       var contact = {};
+       contact["id"] = this.id_cont;
+       contact["name"] = this.new_name.name;
+       contact["number"] = this.new_number.number;
+       contact["special"] = this.new_number.special;
 
-      this.contact_list.push(contact);
-      this.resetForm();
-      this.id_cont++;
-      this.show_add_btn = true;
+       this.contact_list.push(contact);
+       this.resetForm();
+       this.id_cont++;
+       this.show_add_btn = true;
+      }
+     } else {
+      var contact = this.contact_list[index];
+      contact.Name = this.editForm.modName;
+      contact.number = this.editForm.modNumber;
+      contact.special = this.editForm.special;
      }
     },
     updateLocalStorage(action) {
@@ -714,40 +829,89 @@
       else this.show_list = false;
      }
     },
-    resetForm() {
-     document.getElementById("contact_form").reset();
-     this.resetNewName();
-     this.resetNewNumber();
-    },
-    editContact() {},
-    deleteContact(index, event) {
-     if (confirm("Você tem certeza?")) {
-      this.contact_list.splice(index, 1);
+
+    // EDIT FORM FUNCTIONS
+    toggleEditForm(index) {
+     if (this.show_form) {
+      this.show_form = !this.show_form;
+     }
+     if (this.showEditForm) {
+      this.showEditForm = false;
+      this.editForm.index = "";
+     } else {
+      this.showEditForm = true;
+      this.editForm.index = index;
+      this.getModInfo(index);
      }
     },
+    getModInfo(index) {
+     var contact = this.contact_list[index];
+     this.editForm.modName = contact.name;
+     this.editForm.modNumber = contact.number;
+    },
+
+    // MOD NAME FUNCTIONS
+    modNameInput() {
+     this.ModNameMask();
+     console.log(this.editForm.special);
+    },
+    ModNameMask(e) {
+     //  Doesn't accept space at the end
+     var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
+     var teste = regex.test(this.editForm.modName);
+
+     if (teste) {
+      this.editForm.modNameError = false;
+      return true;
+     } else {
+      this.editForm.modNameError = true;
+      var elem = "modNameError";
+      var msg = "Mínimo de 2 palavras. Cada palavra precisa começar com 3 letras.";
+      this.updateErrorMsg(elem, msg);
+     }
+    },
+   },
+
+   // MOD NUMBER FUNCTIONS
+   modNumberInput(e) {
+    this.ModNumberMask(e);
+    this.checkModNumber();
+    this.checkModIsSpecial();
+    console.log(this.editForm.special);
+   },
+   checkModNumber() {
+    var modNumber = this.editForm.modNumber;
+    var msg;
+    if (modNumber !== "" && modNumber.length < 14) {
+     msg = "Preecha o telefone corretamente.";
+     this.editForm.modNumberError = true;
+     this.updateErrorMsg("modNumber", msg);
+    } else {
+     this.editForm.modNumberError = false;
+    }
+   },
+   ModNumberMask(e) {
+    if (e.inputType !== "deleteContentBackward") {
+     this.editForm.modNumber = this.editForm.modNumber
+      .replace(/[^0-9]/g, "")
+      .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
+      .substr(0, 14);
+    }
+   },
+   checkModIsSpecial() {
+    if (this.editForm.modNumber.includes("(11) ")) {
+     this.editForm.special = true;
+    } else {
+     this.editForm.special = false;
+    }
+   },
+   deleteContact(index, event) {
+    if (confirm("Você tem certeza?")) {
+     this.contact_list.splice(index, 1);
+    }
    },
   });
 
   app.mount("#app");
  </script>
-
- <!-- Vue Instance and Routes -->
- <!-- <script>
-  var routes = [
-   // { path: '/', component: Home },
-   // { path: '/about', component: About },
-   // { path: '/contact', component: Contact }
-  ];
-
-  var router = new VueRouter({
-   routes: routes,
-   mode: "history",
-   base: "/",
-  });
-
-  var app = new Vue({
-   el: "#app",
-   router: router,
-  });
- </script> -->
 </html>
