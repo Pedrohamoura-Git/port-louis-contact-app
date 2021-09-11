@@ -870,45 +870,45 @@
       this.updateErrorMsg(elem, msg);
      }
     },
-   },
 
-   // MOD NUMBER FUNCTIONS
-   modNumberInput(e) {
-    this.ModNumberMask(e);
-    this.checkModNumber();
-    this.checkModIsSpecial();
-    console.log(this.editForm.special);
-   },
-   checkModNumber() {
-    var modNumber = this.editForm.modNumber;
-    var msg;
-    if (modNumber !== "" && modNumber.length < 14) {
-     msg = "Preecha o telefone corretamente.";
-     this.editForm.modNumberError = true;
-     this.updateErrorMsg("modNumber", msg);
-    } else {
-     this.editForm.modNumberError = false;
-    }
-   },
-   ModNumberMask(e) {
-    if (e.inputType !== "deleteContentBackward") {
-     this.editForm.modNumber = this.editForm.modNumber
-      .replace(/[^0-9]/g, "")
-      .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
-      .substr(0, 14);
-    }
-   },
-   checkModIsSpecial() {
-    if (this.editForm.modNumber.includes("(11) ")) {
-     this.editForm.special = true;
-    } else {
-     this.editForm.special = false;
-    }
-   },
-   deleteContact(index, event) {
-    if (confirm("Você tem certeza?")) {
-     this.contact_list.splice(index, 1);
-    }
+    // MOD NUMBER FUNCTIONS
+    modNumberInput(e) {
+     this.ModNumberMask(e);
+     this.checkModNumber();
+     this.checkModIsSpecial();
+     console.log(this.editForm.special);
+    },
+    checkModNumber() {
+     var modNumber = this.editForm.modNumber;
+     var msg;
+     if (modNumber !== "" && modNumber.length < 14) {
+      msg = "Preecha o telefone corretamente.";
+      this.editForm.modNumberError = true;
+      this.updateErrorMsg("modNumber", msg);
+     } else {
+      this.editForm.modNumberError = false;
+     }
+    },
+    ModNumberMask(e) {
+     if (e.inputType !== "deleteContentBackward") {
+      this.editForm.modNumber = this.editForm.modNumber
+       .replace(/[^0-9]/g, "")
+       .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
+       .substr(0, 14);
+     }
+    },
+    checkModIsSpecial() {
+     if (this.editForm.modNumber.includes("(11) ")) {
+      this.editForm.special = true;
+     } else {
+      this.editForm.special = false;
+     }
+    },
+    deleteContact(index, event) {
+     if (confirm("Você tem certeza?")) {
+      this.contact_list.splice(index, 1);
+     }
+    },
    },
   });
 
