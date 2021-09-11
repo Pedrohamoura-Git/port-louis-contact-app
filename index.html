@@ -135,7 +135,6 @@
         </svg>
        </span>
       </label>
-
       <!-- ERROR MSG MOD Name-->
       <div v-if="this.editForm.showModNameErrorMsg" class="error_card">{{this.editForm.modNameErrorMsg}}</div>
       <!-- ERROR MSG  -->
@@ -171,9 +170,10 @@
       <!-- ERROR MSG MOD NUMBER-->
       <div v-if="this.editForm.showModNumberErrorMsg" class="error_card">{{this.editForm.modNumberErrorMsg}}</div>
       <!-- ERROR MSG  -->
+
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact()">Modificar</button>
-       <!-- <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button> -->
+       <button class="btn btn--clear" @click.prevent="resetEditForm()">Clear</button>
       </div>
      </form>
     </div>
@@ -780,10 +780,9 @@
      this.new_number.number = this.new_number.backupNumber;
     },
     addContact() {
-     const index = this.editForm.index;
-     if (index == "") {
+     var contact = {};
+     if (this.editForm.modName === "" && this.editForm.modNumber == "") {
       if (this.checkName() && this.checkNumber()) {
-       var contact = {};
        contact["id"] = this.id_cont;
        contact["name"] = this.new_name.name;
        contact["number"] = this.new_number.number;
@@ -794,11 +793,16 @@
        this.id_cont++;
        this.show_add_btn = true;
       }
-     } else {
-      var contact = this.contact_list[index];
-      contact.Name = this.editForm.modName;
-      contact.number = this.editForm.modNumber;
-      contact.special = this.editForm.special;
+     } else if (!this.editForm.modNameError && !this.editForm.modNumberError) {
+      contact["name"] = this.editForm.modName;
+      contact["number"] = this.editForm.modNumber;
+      contact["special"] = this.editForm.special;
+      console.log(contact);
+
+      this.contact_list[this.editForm.index] = contact;
+      console.log(this.contact_list[this.editForm.index]);
+      this.showEditForm = false;
+      this.resetEditForm();
      }
     },
     updateLocalStorage(action) {
@@ -846,20 +850,38 @@
       this.editForm.index = "";
      } else {
       this.showEditForm = true;
-      this.editForm.index = index;
       this.getModInfo(index);
      }
     },
     getModInfo(index) {
      var contact = this.contact_list[index];
+     this.editForm.index = index;
      this.editForm.modName = contact.name;
      this.editForm.modNumber = contact.number;
+     this.editForm.special = contact.special;
     },
-
+    resetEditForm() {
+     document.getElementById("edit_Form").reset();
+     this.resetModName();
+     this.resetModNumber();
+     console.log("reseted");
+    },
+    resetModName() {
+     this.editForm.modName = "";
+     this.editForm.modNameError = false;
+     this.editForm.modNameErrorMsg = "";
+     console.log("reseted 1");
+    },
+    resetModNumber() {
+     this.editForm.modNumber = "";
+     this.editForm.modNumberError = false;
+     this.editForm.modNumberErrorMsg = "";
+     console.log("reseted 2");
+    },
     // MOD NAME FUNCTIONS
     modNameInput() {
      this.ModNameMask();
-     console.log(this.editForm.special);
+     //  this.modNameInput();
     },
     ModNameMask(e) {
      //  Doesn't accept space at the end
