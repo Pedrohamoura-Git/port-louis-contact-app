@@ -28,8 +28,7 @@
   <div id="app">
    <div class="wrapper">
     <button v-if="show_add_btn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
-    <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button>
-
+    <!-- <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button> -->
     <div v-if="show_form" class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
@@ -97,6 +96,13 @@
       <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}}</div>
       <!-- ERROR MSG  -->
       <div class="form__options">
+       <button class="btn btn--close_card" @click.prevent="toggleShowFormBtn">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+         <path
+          d="M12 11.293l10.293-10.293.707.707-10.293 10.293 10.293 10.293-.707.707-10.293-10.293-10.293 10.293-.707-.707 10.293-10.293-10.293-10.293.707-.707 10.293 10.293z"
+         />
+        </svg>
+       </button>
        <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
        <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
       </div>
@@ -172,6 +178,13 @@
       <!-- ERROR MSG  -->
 
       <div class="form__options">
+       <button class="btn btn--close_card" @click.prevent="toggleEditForm()">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+         <path
+          d="M12 11.293l10.293-10.293.707.707-10.293 10.293 10.293 10.293-.707.707-10.293-10.293-10.293 10.293-.707-.707 10.293-10.293-10.293-10.293.707-.707 10.293 10.293z"
+         />
+        </svg>
+       </button>
        <button class="btn btn--green" @click.prevent="addContact()">Modificar</button>
        <button class="btn btn--clear" @click.prevent="resetEditForm()">Clear</button>
       </div>
@@ -344,6 +357,28 @@
     position: fixed;
     top: 10px;
     right: 21px;
+   }
+
+   &--close_card {
+    background-color: rgba(@bg-rbg-color-table, 0);
+    position: absolute;
+    top: -2px;
+    right: -5px;
+    svg {
+     transform: scale(0.85);
+     path {
+      fill: rgba(@bg-rbg-color-table, 0.8);
+     }
+    }
+
+    &:hover {
+     svg {
+      /* background-color: @bg-color-warning; */
+      path {
+       fill: rgba(@bg-rbg-color-table, 1);
+      }
+     }
+    }
    }
 
    &--add {
@@ -797,7 +832,6 @@
       contact["name"] = this.editForm.modName;
       contact["number"] = this.editForm.modNumber;
       contact["special"] = this.editForm.special;
-      console.log(contact);
 
       this.contact_list[this.editForm.index] = contact;
       console.log(this.contact_list[this.editForm.index]);
