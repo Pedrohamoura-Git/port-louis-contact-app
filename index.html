@@ -43,16 +43,16 @@
         class="form__input"
         type="text"
         :class="[
-        {'': nameIsEmpty}, 
-        {'form__input--error': nameIsWrong},
-        {'form__input--correct': nameIsCorrect}]"
+        {'': toggleClasses.nameIsEmpty}, 
+        {'form__input--error': toggleClasses.nameIsWrong},
+        {'form__input--correct': toggleClasses.nameIsCorrect}]"
         id="new__name"
         placeholder="Nome"
         v-model="addForm.newName.name"
         required="required"
        />
-       <!-- v-if="nameIsWrong" -->
-       <span v-if="nameIsWrong" class="btn--warning_info" @click="nameToggleErrorMsg()">
+       <!-- v-if="toggleClasses.nameIsWrong" -->
+       <span v-if="toggleClasses.nameIsWrong" class="btn--warning_info" @click="nameToggleErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -73,9 +73,9 @@
        <input
         class="form__input"
         :class="[
-        {'': numberIsEmpty}, 
-        {'form__input--error': numberIsWrong},
-        {'form__input--correct': numberIsCorrect}]"
+        {'': toggleClasses.numberIsEmpty}, 
+        {'form__input--error': toggleClasses.numberIsWrong},
+        {'form__input--correct': toggleClasses.numberIsCorrect}]"
         type="tel"
         id="new__phone_number"
         placeholder="telefone"
@@ -84,8 +84,8 @@
         @keydown.backspace="disableNumberMask()"
         required="required"
        />
-       <!-- v-if="numberIsWrong" -->
-       <span v-if="numberIsWrong" class="btn--warning_info" @click="numberToggleErrorMsg()">
+       <!-- v-if="toggleClasses.numberIsWrong" -->
+       <span v-if="toggleClasses.numberIsWrong" class="btn--warning_info" @click="numberToggleErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -123,9 +123,9 @@
         class="form__input"
         type="text"
         :class="[
-        {'': nameIsEmpty}, 
-        {'form__input--error': this.editForm.modName.error},
-        {'form__input--correct': !this.editForm.modName.error}]"
+        {'': toggleClasses.nameIsEmpty}, 
+        {'form__input--error': editForm.modName.error},
+        {'form__input--correct': !editForm.modName.error}]"
         id="mod__name"
         placeholder="Nome"
         v-model="editForm.modName.name"
@@ -134,7 +134,7 @@
        />
 
        <!-- Error icon  -->
-       <span v-if="this.editForm.modName.error" class="btn--warning_info" @click="toggleModNameErrorMsg()">
+       <span v-if="editForm.modName.error" class="btn--warning_info" @click="toggleModNameErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -143,7 +143,7 @@
        </span>
       </label>
       <!-- ERROR MSG MOD Name-->
-      <div v-if="this.editForm.modName.showErrorMsg" class="error_card">{{this.editForm.modName.errorMsg}}</div>
+      <div v-if="editForm.modName.showErrorMsg" class="error_card">{{editForm.modName.errorMsg}}</div>
       <!-- ERROR MSG  -->
 
       <label for="mod__phone_number" class="form__label">
@@ -155,9 +155,9 @@
        <input
         class="form__input"
         :class="[
-        {'': nameIsEmpty}, 
-        {'form__input--error': this.editForm.modNumber.error},
-        {'form__input--correct': !this.editForm.modNumber.error}]"
+        {'': toggleClasses.nameIsEmpty}, 
+        {'form__input--error': editForm.modNumber.error},
+        {'form__input--correct': !editForm.modNumber.error}]"
         type="tel"
         id="mod__phone_number"
         placeholder="telefone"
@@ -165,8 +165,8 @@
         @input="modNumberInput($event)"
         required="required"
        />
-       <!-- v-if="numberIsWrong" -->
-       <span v-if="this.editForm.modNumber.error" class="btn--warning_info" @click="toggleModNumberErrorMsg()">
+       <!-- v-if="toggleClasses.numberIsWrong" -->
+       <span v-if="editForm.modNumber.error" class="btn--warning_info" @click="toggleModNumberErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -175,7 +175,7 @@
        </span>
       </label>
       <!-- ERROR MSG MOD NUMBER-->
-      <div v-if="this.editForm.modNumber.showErrorMsg" class="error_card">{{this.editForm.modNumber.errorMsg}}</div>
+      <div v-if="editForm.modNumber.showErrorMsg" class="error_card">{{editForm.modNumber.errorMsg}}</div>
       <!-- ERROR MSG  -->
 
       <div class="form__options">
@@ -659,6 +659,15 @@
      toggleBtns: {
       showAddBtn: true,
      },
+     toggleClasses: {
+      nameIsEmpty: true,
+      nameIsWrong: false,
+      nameIsCorrect: false,
+
+      numberIsEmpty: true,
+      numberIsWrong: false,
+      numberIsCorrect: false,
+     },
      addForm: {
       newName: {
        name: "",
@@ -675,7 +684,6 @@
        special: false,
       },
      },
-
      editForm: {
       index: "",
 
@@ -696,14 +704,6 @@
 
      contactList: [],
      idCont: 0,
-
-     nameIsEmpty: true,
-     nameIsWrong: false,
-     nameIsCorrect: false,
-
-     numberIsEmpty: true,
-     numberIsWrong: false,
-     numberIsCorrect: false,
     };
    },
    created() {
@@ -761,23 +761,23 @@
     },
     nameClassesToggle() {
      if (this.addForm.newName.name === "") {
-      this.nameIsEmpty = true;
-      this.nameIsCorrect = false;
-      this.nameIsWrong = false;
+      this.toggleClasses.nameIsEmpty = true;
+      this.toggleClasses.nameIsCorrect = false;
+      this.toggleClasses.nameIsWrong = false;
      } else {
-      this.nameIsCorrect = !this.addForm.newName.error;
-      this.nameIsWrong = this.addForm.newName.error;
+      this.toggleClasses.nameIsCorrect = !this.addForm.newName.error;
+      this.toggleClasses.nameIsWrong = this.addForm.newName.error;
      }
      console.log("nameClassesToggle");
     },
     numberClassesToggle() {
      if (this.addForm.newNumber.number === "") {
-      this.numberIsEmpty = true;
-      this.numberIsCorrect = false;
-      this.numberIsWrong = false;
+      this.toggleClasses.numberIsEmpty = true;
+      this.toggleClasses.numberIsCorrect = false;
+      this.toggleClasses.numberIsWrong = false;
      } else {
-      this.numberIsCorrect = !this.addForm.newNumber.error;
-      this.numberIsWrong = this.addForm.newNumber.error;
+      this.toggleClasses.numberIsCorrect = !this.addForm.newNumber.error;
+      this.toggleClasses.numberIsWrong = this.addForm.newNumber.error;
      }
     },
     resetForm() {
