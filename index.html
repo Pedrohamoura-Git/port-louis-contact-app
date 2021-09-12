@@ -27,10 +27,10 @@
  <body>
   <div id="app">
    <div class="wrapper">
-    <button v-if="showAddBtn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
+    <button v-if="toggleBtns.showAddBtn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
     <!-- <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button> -->
     <!--  v-if="showForm"-->
-    <div class="new_contact">
+    <div v-if="DOM.showAddForm" class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
 
@@ -48,7 +48,7 @@
         {'form__input--correct': nameIsCorrect}]"
         id="new__name"
         placeholder="Nome"
-        v-model="newName.name"
+        v-model="addForm.newName.name"
         required="required"
        />
        <!-- v-if="nameIsWrong" -->
@@ -61,7 +61,7 @@
        </span>
       </label>
       <!-- ERROR MSG NAME -->
-      <div v-if="newName.show_error_msg" class="error_card">{{newName.error_msg}}</div>
+      <div v-if="addForm.newName.showErrorMsg" class="error_card">{{addForm.newName.errorMsg}}</div>
       <!-- ERROR MSG  -->
 
       <label for="new__phone_number" class="form__label">
@@ -79,7 +79,7 @@
         type="tel"
         id="new__phone_number"
         placeholder="telefone"
-        v-model="newNumber.number"
+        v-model="addForm.newNumber.number"
         @input="newNumberInput()"
         @keydown.backspace="disableNumberMask()"
         required="required"
@@ -94,7 +94,7 @@
        </span>
       </label>
       <!-- ERROR MSG  NUMBER-->
-      <div v-if="newNumber.show_error_msg" class="error_card">{{newNumber.error_msg}}</div>
+      <div v-if="addForm.newNumber.showErrorMsg" class="error_card">{{addForm.newNumber.errorMsg}}</div>
       <!-- ERROR MSG  -->
       <div class="form__options">
        <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
@@ -110,7 +110,7 @@
      </form>
     </div>
 
-    <div v-if="showEditForm" class="new_contact">
+    <div v-if="DOM.showEditForm" class="new_contact">
      <form action="#" class="form" id="edit_Form">
       <h2 class="block__title">Modifique o contato</h2>
 
@@ -192,7 +192,7 @@
      </form>
     </div>
 
-    <div v-if="showContactList" class="contact-list">
+    <div v-if="DOM.showContactList" class="contact-list">
      <h2 class="block__title">Seus contatos</h2>
      <table class="table">
       <thead class="table__head">
@@ -651,9 +651,32 @@
   const app = Vue.createApp({
    data() {
     return {
-     showEditForm: false,
+     DOM: {
+      showAddForm: true,
+      showEditForm: false,
+      showContactList: false,
+     },
+     toggleBtns: {
+      showAddBtn: true,
+     },
+     addForm: {
+      newName: {
+       name: "",
+       error: false,
+       errorMsg: "",
+       showErrorMsg: false,
+      },
+      newNumber: {
+       number: "",
+       backupNumber: "",
+       error: false,
+       errorMsg: "",
+       showErrorMsg: false,
+       special: false,
+      },
+     },
+
      editForm: {
-      showForm: false,
       index: "",
       modName: "",
       modNameError: false,
@@ -666,9 +689,6 @@
       special: "",
      },
 
-     showForm: true,
-     showContactList: false,
-     showAddBtn: true,
      contactList: [],
      contactId: 0,
 
@@ -679,21 +699,6 @@
      numberIsEmpty: true,
      numberIsWrong: false,
      numberIsCorrect: false,
-
-     newName: {
-      name: "",
-      error: false,
-      error_msg: "",
-      show_error_msg: false,
-     },
-     newNumber: {
-      number: "",
-      backupNumber: "",
-      error: false,
-      error_msg: "",
-      show_error_msg: false,
-      special: false,
-     },
     };
    },
    created() {
@@ -704,19 +709,19 @@
     contactList: {
      handler() {
       this.updateLocalStorage("set");
-      this.ShowForm();
-      this.ShowContactList();
+      this.updateDOM();
+      this.toggleShowContactList();
      },
      deep: true,
     },
-    newName: {
+    "addForm.newName": {
      handler() {
       this.checkName();
       this.nameClassesToggle();
      },
      deep: true,
     },
-    newNumber: {
+    "addForm.newNumber": {
      handler() {
       this.checkNumber();
       this.checkIsSpecial();
@@ -727,22 +732,22 @@
    },
    methods: {
     nameToggleErrorMsg() {
-     this.newName.show_error_msg = !this.newName.show_error_msg;
+     this.addForm.newName.showErrorMsg = !this.addForm.newName.showErrorMsg;
     },
     numberToggleErrorMsg() {
-     this.newNumber.show_error_msg = !this.newNumber.show_error_msg;
+     this.addForm.newNumber.showErrorMsg = !this.addForm.newNumber.showErrorMsg;
     },
     newNumberInput() {
      this.doNumberBackup();
      this.applyNumberMask();
     },
     doNumberBackup() {
-     this.newNumber.backupNumber = this.newNumber.number;
+     this.addForm.newNumber.backupNumber = this.addForm.newNumber.number;
     },
     applyNumberMask() {
      document.getElementById("new__phone_number").addEventListener("input", (e) => {
       if (e.inputType !== "deleteContentBackward") {
-       this.newNumber.number = this.newNumber.number
+       this.addForm.newNumber.number = this.addForm.newNumber.number
         .replace(/[^0-9]/g, "")
         .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
         .substr(0, 14);
@@ -750,89 +755,92 @@
      });
     },
     nameClassesToggle() {
-     if (this.newName.name === "") {
+     if (this.addForm.newName.name === "") {
       this.nameIsEmpty = true;
       this.nameIsCorrect = false;
       this.nameIsWrong = false;
      } else {
-      this.nameIsCorrect = !this.newName.error;
-      this.nameIsWrong = this.newName.error;
+      this.nameIsCorrect = !this.addForm.newName.error;
+      this.nameIsWrong = this.addForm.newName.error;
      }
+     console.log("nameClassesToggle");
     },
     numberClassesToggle() {
-     if (this.newNumber.number === "") {
+     if (this.addForm.newNumber.number === "") {
       this.numberIsEmpty = true;
       this.numberIsCorrect = false;
       this.numberIsWrong = false;
      } else {
-      this.numberIsCorrect = !this.newNumber.error;
-      this.numberIsWrong = this.newNumber.error;
+      this.numberIsCorrect = !this.addForm.newNumber.error;
+      this.numberIsWrong = this.addForm.newNumber.error;
      }
     },
     resetForm() {
      document.getElementById("contact_form").reset();
      this.resetNewName();
-     this.resetNewNumber();
+     this.addForm.resetNewNumber();
     },
     resetNewName() {
-     this.newName.name = "";
-     this.newName.error = false;
-     this.newName.error_msg = "";
+     this.addForm.newName.name = "";
+     this.addForm.newName.error = false;
+     this.addForm.newName.errorMsg = "";
     },
     resetNewNumber() {
-     this.newNumber.number = "";
-     this.newNumber.error = false;
-     this.newNumber.error_msg = "";
+     this.addForm.newNumber.number = "";
+     this.addForm.newNumber.error = false;
+     this.addForm.newNumber.errorMsg = "";
     },
     checkName() {
      //  Do accept space at the end
      //  var regex = /^([a-z]{3,}[\S]*(?=\s|$) ?){2,}$/gim;
 
-     if (this.newName.name !== "") {
+     if (this.addForm.newName.name !== "") {
       //  Doesn't accept space at the end
       var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
-      var teste = regex.test(this.newName.name);
+      var teste = regex.test(this.addForm.newName.name);
 
       if (teste) {
-       this.newName.error = false;
+       this.addForm.newName.error = false;
        return true;
       } else {
-       this.newName.error = true;
+       this.addForm.newName.error = true;
        var elem = "newName";
        var msg = "Mínimo de 2 palavras. Cada palavra precisa começar com 3 letras.";
        this.updateErrorMsg(elem, msg);
+       console.log("checkName");
       }
      }
      return false;
     },
     checkNumber() {
-     var number = this.newNumber.number;
+     var number = this.addForm.newNumber.number;
      var msg;
      if (number !== "" && number.length < 14) {
       msg = "Preecha o telefone corretamente.";
-      this.newNumber.error = true;
-      this.updateErrorMsg("newNumber", msg);
+      this.addForm.newNumber.error = true;
+      this.updateErrorMsg("addForm.newNumber", msg);
       return false;
      } else {
-      this.newNumber.error = false;
+      this.addForm.newNumber.error = false;
       return true;
      }
     },
     checkIsSpecial() {
-     if (this.newNumber.number.includes("(11) ")) {
-      this.newNumber.special = true;
+     if (this.addForm.newNumber.number.includes("(11) ")) {
+      this.addForm.newNumber.special = true;
      } else {
-      this.newNumber.special = false;
+      this.addForm.newNumber.special = false;
      }
     },
     updateErrorMsg(elem, msg) {
      if (elem === "newName") {
-      this.newName.error = true;
-      this.newName.error_msg = msg;
+      this.addForm.newName.error = true;
+      this.addForm.newName.errorMsg = msg;
+      console.log("errorMsg");
      }
-     if (elem === "newNumber") {
-      this.newNumber.error = true;
-      this.newNumber.error_msg = msg;
+     if (elem === "addForm.newNumber") {
+      this.addForm.newNumber.error = true;
+      this.addForm.newNumber.errorMsg = msg;
      }
      if (elem === "modNameError") {
       this.editForm.modNameError = msg;
@@ -843,21 +851,21 @@
      }
     },
     disableNumberMask() {
-     this.newNumber.number = this.newNumber.backupNumber;
+     this.addForm.newNumber.number = this.addForm.newNumber.backupNumber;
     },
     addContact() {
      var contact = {};
      if (this.editForm.modName === "" && this.editForm.modNumber == "") {
       if (this.checkName() && this.checkNumber()) {
        contact["id"] = this.contactId;
-       contact["name"] = this.newName.name;
-       contact["number"] = this.newNumber.number;
-       contact["special"] = this.newNumber.special;
+       contact["name"] = this.addForm.newName.name;
+       contact["number"] = this.addForm.newNumber.number;
+       contact["special"] = this.addForm.newNumber.special;
 
        this.contactList.push(contact);
        this.resetForm();
        this.contactId++;
-       this.showAddBtn = true;
+       this.toggleBtns.showAddBtn = true;
       }
      } else if (!this.editForm.modNameError && !this.editForm.modNumberError) {
       contact["name"] = this.editForm.modName;
@@ -866,7 +874,7 @@
 
       this.contactList[this.editForm.index] = contact;
       console.log(this.contactList[this.editForm.index]);
-      this.showEditForm = false;
+      this.DOM.showEditForm = false;
       this.resetEditForm();
      }
     },
@@ -880,43 +888,44 @@
      }
     },
     toggleShowFormBtn() {
-     if (this.showAddBtn) {
-      this.ShowForm(true, true);
-      this.showAddBtn = false;
+     if (this.toggleBtns.showAddBtn) {
+      this.updateDOM(true, true);
+      this.toggleBtns.showAddBtn = false;
      } else {
-      this.ShowForm(true, false);
-      this.showAddBtn = true;
+      this.updateDOM(true, false);
+      this.toggleBtns.showAddBtn = true;
      }
     },
-    ShowForm(imperative, value) {
+    // updateDOM(elem, value) {
+    updateDOM(imperative, value) {
      if (imperative) {
-      this.showForm = value;
+      this.DOM.showAddForm = value;
      } else {
-      if (this.contactList.length) this.showForm = false;
-      else this.showForm = true;
+      if (this.contactList.length) this.DOM.showAddForm = false;
+      else this.DOM.showAddForm = true;
      }
     },
-    ShowContactList(imperative, value) {
+    toggleShowContactList(imperative, value) {
      if (imperative) {
-      this.showContactList = value;
+      this.DOM.showContactList = value;
      } else {
-      if (this.contactList.length > 0) this.showContactList = true;
-      else this.showContactList = false;
+      if (this.contactList.length > 0) this.DOM.showContactList = true;
+      else this.DOM.showContactList = false;
      }
     },
 
     // EDIT FORM FUNCTIONS
     toggleEditForm(index) {
-     if (this.showForm) {
-      this.showForm = !this.showForm;
+     if (this.DOM.showAddForm) {
+      this.DOM.showAddForm = !this.DOM.showAddForm;
      }
-     if (this.showEditForm) {
-      this.showEditForm = false;
-      this.showAddBtn = true;
+     if (this.DOM.showEditForm) {
+      this.DOM.showEditForm = false;
+      this.toggleBtns.showAddBtn = true;
       this.editForm.index = "";
      } else {
-      this.showEditForm = true;
-      this.showAddBtn = false;
+      this.DOM.showEditForm = true;
+      this.toggleBtns.showAddBtn = false;
       this.getModInfo(index);
      }
     },
