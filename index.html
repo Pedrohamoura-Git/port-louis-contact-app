@@ -80,7 +80,7 @@
         id="new__phone_number"
         placeholder="telefone"
         v-model="addForm.newNumber.number"
-        @input="newNumberInput()"
+        @input="addForm.newNumberInput()"
         @keydown.backspace="disableNumberMask()"
         required="required"
        />
@@ -124,17 +124,17 @@
         type="text"
         :class="[
         {'': nameIsEmpty}, 
-        {'form__input--error': this.editForm.modNameError},
-        {'form__input--correct': !this.editForm.modNameError}]"
+        {'form__input--error': this.editForm.modName.error},
+        {'form__input--correct': !this.editForm.modName.error}]"
         id="mod__name"
         placeholder="Nome"
-        v-model="editForm.modName"
+        v-model="editForm.modName.name"
         @input="modNameInput($event)"
         required="required"
        />
 
        <!-- Error icon  -->
-       <span v-if="this.editForm.modNameError" class="btn--warning_info" @click="toggleModNameErrorMsg()">
+       <span v-if="this.editForm.modName.error" class="btn--warning_info" @click="toggleModNameErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -143,7 +143,7 @@
        </span>
       </label>
       <!-- ERROR MSG MOD Name-->
-      <div v-if="this.editForm.showModNameErrorMsg" class="error_card">{{this.editForm.modNameErrorMsg}}</div>
+      <div v-if="this.editForm.modName.showErrorMsg" class="error_card">{{this.editForm.modName.errorMsg}}</div>
       <!-- ERROR MSG  -->
 
       <label for="mod__phone_number" class="form__label">
@@ -156,17 +156,17 @@
         class="form__input"
         :class="[
         {'': nameIsEmpty}, 
-        {'form__input--error': this.editForm.modNumberError},
-        {'form__input--correct': !this.editForm.modNumberError}]"
+        {'form__input--error': this.editForm.modNumber.error},
+        {'form__input--correct': !this.editForm.modNumber.error}]"
         type="tel"
         id="mod__phone_number"
         placeholder="telefone"
-        v-model="editForm.modNumber"
+        v-model="editForm.modNumber.number"
         @input="modNumberInput($event)"
         required="required"
        />
        <!-- v-if="numberIsWrong" -->
-       <span v-if="this.editForm.modNumberError" class="btn--warning_info" @click="toggleModNumberErrorMsg()">
+       <span v-if="this.editForm.modNumber.error" class="btn--warning_info" @click="toggleModNumberErrorMsg()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -175,7 +175,7 @@
        </span>
       </label>
       <!-- ERROR MSG MOD NUMBER-->
-      <div v-if="this.editForm.showModNumberErrorMsg" class="error_card">{{this.editForm.modNumberErrorMsg}}</div>
+      <div v-if="this.editForm.modNumber.showErrorMsg" class="error_card">{{this.editForm.modNumber.errorMsg}}</div>
       <!-- ERROR MSG  -->
 
       <div class="form__options">
@@ -678,19 +678,24 @@
 
      editForm: {
       index: "",
-      modName: "",
-      modNameError: false,
-      showModNameErrorMsg: false,
-      modNameErrorMsg: "rwar",
-      modNumber: "",
-      modNumberError: false,
-      showModNumberErrorMsg: false,
-      modNumberErrorMsg: "djklaw",
-      special: "",
+
+      modName: {
+       name: "",
+       error: false,
+       errorMsg: "roar!",
+       showErrorMsg: false,
+      },
+      modNumber: {
+       number: "",
+       error: false,
+       errorMsg: "roar!",
+       showErrorMsg: false,
+       special: "",
+      },
      },
 
      contactList: [],
-     contactId: 0,
+     idCont: 0,
 
      nameIsEmpty: true,
      nameIsWrong: false,
@@ -818,7 +823,7 @@
      if (number !== "" && number.length < 14) {
       msg = "Preecha o telefone corretamente.";
       this.addForm.newNumber.error = true;
-      this.updateErrorMsg("addForm.newNumber", msg);
+      this.updateErrorMsg("newNumber", msg);
       return false;
      } else {
       this.addForm.newNumber.error = false;
@@ -836,18 +841,19 @@
      if (elem === "newName") {
       this.addForm.newName.error = true;
       this.addForm.newName.errorMsg = msg;
-      console.log("errorMsg");
      }
-     if (elem === "addForm.newNumber") {
+     if (elem === "newNumber") {
       this.addForm.newNumber.error = true;
       this.addForm.newNumber.errorMsg = msg;
      }
-     if (elem === "modNameError") {
-      this.editForm.modNameError = msg;
+     if (elem === "modName") {
+      this.editForm.modName.errorMsg = msg;
      }
-     if (elem === "modNumberError") {
-      this.editForm.modNumberError = true;
-      this.editForm.modNumberError = msg;
+     if (elem === "modNumber") {
+      console.log(`${msg}`);
+      console.log(`${this.editForm.modNumber.errorMsg}`);
+      this.editForm.modNumber.error = true;
+      this.editForm.modNumber.errorMsg = msg;
      }
     },
     disableNumberMask() {
@@ -857,20 +863,20 @@
      var contact = {};
      if (this.editForm.modName === "" && this.editForm.modNumber == "") {
       if (this.checkName() && this.checkNumber()) {
-       contact["id"] = this.contactId;
+       contact["id"] = this.idCont;
        contact["name"] = this.addForm.newName.name;
        contact["number"] = this.addForm.newNumber.number;
        contact["special"] = this.addForm.newNumber.special;
 
        this.contactList.push(contact);
        this.resetForm();
-       this.contactId++;
+       this.idCont++;
        this.toggleBtns.showAddBtn = true;
       }
-     } else if (!this.editForm.modNameError && !this.editForm.modNumberError) {
-      contact["name"] = this.editForm.modName;
-      contact["number"] = this.editForm.modNumber;
-      contact["special"] = this.editForm.special;
+     } else if (!this.editForm.modName.error && !this.editForm.modNumber.error) {
+      contact["name"] = this.editForm.modName.name;
+      contact["number"] = this.editForm.modNumber.number;
+      contact["special"] = this.editForm.modNumber.special;
 
       this.contactList[this.editForm.index] = contact;
       console.log(this.contactList[this.editForm.index]);
@@ -932,9 +938,9 @@
     getModInfo(index) {
      var contact = this.contactList[index];
      this.editForm.index = index;
-     this.editForm.modName = contact.name;
-     this.editForm.modNumber = contact.number;
-     this.editForm.special = contact.special;
+     this.editForm.modName.name = contact.name;
+     this.editForm.modNumber.number = contact.number;
+     this.editForm.modNumber.special = contact.special;
     },
     resetEditForm() {
      document.getElementById("edit_Form").reset();
@@ -943,15 +949,15 @@
      console.log("reseted");
     },
     resetModName() {
-     this.editForm.modName = "";
-     this.editForm.modNameError = false;
-     this.editForm.modNameErrorMsg = "";
-     console.log("reseted 1");
+     this.editForm.modName.number = "";
+     this.editForm.modName.error = false;
+     this.editForm.modName.errorMsg = "";
+     console.log("reseted MODName");
     },
     resetModNumber() {
-     this.editForm.modNumber = "";
-     this.editForm.modNumberError = false;
-     this.editForm.modNumberErrorMsg = "";
+     this.editForm.modNumber.number = "";
+     this.editForm.modNumber.error = false;
+     this.editForm.modNumber.errorMsg = "";
      console.log("reseted 2");
     },
     // MOD NAME FUNCTIONS
@@ -962,20 +968,20 @@
     ModNameMask(e) {
      //  Doesn't accept space at the end
      var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
-     var teste = regex.test(this.editForm.modName);
+     var teste = regex.test(this.editForm.modName.name);
 
      if (teste) {
-      this.editForm.modNameError = false;
+      this.editForm.modName.error = false;
       return true;
      } else {
-      this.editForm.modNameError = true;
-      var elem = "modNameError";
+      this.editForm.modName.error = true;
+      var elem = "modName";
       var msg = "Mínimo de 2 palavras. Cada palavra precisa começar com 3 letras.";
       this.updateErrorMsg(elem, msg);
      }
     },
     toggleModNameErrorMsg() {
-     this.editForm.showModNameErrorMsg = !this.editForm.showModNameErrorMsg;
+     this.editForm.modName.showErrorMsg = !this.editForm.modName.showErrorMsg;
     },
 
     // MOD NUMBER FUNCTIONS
@@ -983,36 +989,36 @@
      this.ModNumberMask(e);
      this.checkModNumber();
      this.checkModIsSpecial();
-     console.log(this.editForm.special);
+     console.log(this.editForm.modNumber.special);
     },
     checkModNumber() {
-     var modNumber = this.editForm.modNumber;
+     var modNumber = this.editForm.modNumber.number;
      var msg;
      if (modNumber.length < 14) {
       msg = "Preecha o telefone corretamente.";
-      this.editForm.modNumberError = true;
+      this.editForm.modNumber.error = true;
       this.updateErrorMsg("modNumber", msg);
      } else {
-      this.editForm.modNumberError = false;
+      this.editForm.modNumber.error = false;
      }
     },
     ModNumberMask(e) {
      if (e.inputType !== "deleteContentBackward") {
-      this.editForm.modNumber = this.editForm.modNumber
+      this.editForm.modNumber.number = this.editForm.modNumber.number
        .replace(/[^0-9]/g, "")
        .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
        .substr(0, 14);
      }
     },
     checkModIsSpecial() {
-     if (this.editForm.modNumber.includes("(11) ")) {
-      this.editForm.special = true;
+     if (this.editForm.modNumber.number.includes("(11) ")) {
+      this.editForm.modNumber.special = true;
      } else {
-      this.editForm.special = false;
+      this.editForm.modNumber.special = false;
      }
     },
     toggleModNumberErrorMsg() {
-     this.editForm.showModNumberErrorMsg = !this.editForm.showModNumberErrorMsg;
+     this.editForm.modNumber.showErrorMsg = !this.editForm.modNumber.showErrorMsg;
     },
     deleteContact(index, event) {
      if (confirm("Você tem certeza?")) {
