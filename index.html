@@ -27,10 +27,10 @@
  <body>
   <div id="app">
    <div class="wrapper">
-    <button v-if="show_add_btn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
+    <button v-if="showAddBtn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
     <!-- <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button> -->
-    <!-- -->
-    <div v-if="show_form" class="new_contact">
+    <!--  v-if="showForm"-->
+    <div class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
 
@@ -48,7 +48,7 @@
         {'form__input--correct': nameIsCorrect}]"
         id="new__name"
         placeholder="Nome"
-        v-model="new_name.name"
+        v-model="newName.name"
         required="required"
        />
        <!-- v-if="nameIsWrong" -->
@@ -61,7 +61,7 @@
        </span>
       </label>
       <!-- ERROR MSG NAME -->
-      <div v-if="new_name.show_error_msg" class="error_card">{{new_name.error_msg}}</div>
+      <div v-if="newName.show_error_msg" class="error_card">{{newName.error_msg}}</div>
       <!-- ERROR MSG  -->
 
       <label for="new__phone_number" class="form__label">
@@ -79,7 +79,7 @@
         type="tel"
         id="new__phone_number"
         placeholder="telefone"
-        v-model="new_number.number"
+        v-model="newNumber.number"
         @input="newNumberInput()"
         @keydown.backspace="disableNumberMask()"
         required="required"
@@ -94,9 +94,11 @@
        </span>
       </label>
       <!-- ERROR MSG  NUMBER-->
-      <div v-if="new_number.show_error_msg" class="error_card">{{new_number.error_msg}}</div>
+      <div v-if="newNumber.show_error_msg" class="error_card">{{newNumber.error_msg}}</div>
       <!-- ERROR MSG  -->
       <div class="form__options">
+       <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
+       <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
        <button class="btn btn--close_card" @click.prevent="toggleShowFormBtn">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
          <path
@@ -104,8 +106,6 @@
          />
         </svg>
        </button>
-       <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
-       <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
       </div>
      </form>
     </div>
@@ -179,6 +179,8 @@
       <!-- ERROR MSG  -->
 
       <div class="form__options">
+       <button class="btn btn--green" @click.prevent="addContact()">Modificar</button>
+       <button class="btn btn--clear" @click.prevent="resetEditForm()">Clear</button>
        <button class="btn btn--close_card" @click.prevent="toggleEditForm()">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
          <path
@@ -186,13 +188,11 @@
          />
         </svg>
        </button>
-       <button class="btn btn--green" @click.prevent="addContact()">Modificar</button>
-       <button class="btn btn--clear" @click.prevent="resetEditForm()">Clear</button>
       </div>
      </form>
     </div>
 
-    <div v-if="show_list" class="contact-list">
+    <div v-if="showContactList" class="contact-list">
      <h2 class="block__title">Seus contatos</h2>
      <table class="table">
       <thead class="table__head">
@@ -201,7 +201,7 @@
        <th class="table__head__txt">Opções</th>
       </thead>
       <tbody class="table__body">
-       <tr v-for="(item, index) in contact_list" :key="item.id" class="table__row" :class="{special: item.special}">
+       <tr v-for="(item, index) in contactList" :key="item.id" class="table__row" :class="{special: item.special}">
         <td class="table__data table__data--name">{{item.name}}</td>
         <td class="table__data table__data--number">{{item.number}}</td>
         <td class="table__data table__data--options">
@@ -651,10 +651,9 @@
   const app = Vue.createApp({
    data() {
     return {
-     //  showEditForm: true,
      showEditForm: false,
      editForm: {
-      show_form: false,
+      showForm: false,
       index: "",
       modName: "",
       modNameError: false,
@@ -667,11 +666,11 @@
       special: "",
      },
 
-     show_form: true,
-     show_list: false,
-     show_add_btn: true,
-     contact_list: [],
-     id_cont: 0,
+     showForm: true,
+     showContactList: false,
+     showAddBtn: true,
+     contactList: [],
+     contactId: 0,
 
      nameIsEmpty: true,
      nameIsWrong: false,
@@ -681,13 +680,13 @@
      numberIsWrong: false,
      numberIsCorrect: false,
 
-     new_name: {
+     newName: {
       name: "",
       error: false,
       error_msg: "",
       show_error_msg: false,
      },
-     new_number: {
+     newNumber: {
       number: "",
       backupNumber: "",
       error: false,
@@ -702,7 +701,7 @@
    },
    computed: {},
    watch: {
-    contact_list: {
+    contactList: {
      handler() {
       this.updateLocalStorage("set");
       this.ShowForm();
@@ -710,14 +709,14 @@
      },
      deep: true,
     },
-    new_name: {
+    newName: {
      handler() {
       this.checkName();
       this.nameClassesToggle();
      },
      deep: true,
     },
-    new_number: {
+    newNumber: {
      handler() {
       this.checkNumber();
       this.checkIsSpecial();
@@ -728,22 +727,22 @@
    },
    methods: {
     nameToggleErrorMsg() {
-     this.new_name.show_error_msg = !this.new_name.show_error_msg;
+     this.newName.show_error_msg = !this.newName.show_error_msg;
     },
     numberToggleErrorMsg() {
-     this.new_number.show_error_msg = !this.new_number.show_error_msg;
+     this.newNumber.show_error_msg = !this.newNumber.show_error_msg;
     },
     newNumberInput() {
      this.doNumberBackup();
      this.applyNumberMask();
     },
     doNumberBackup() {
-     this.new_number.backupNumber = this.new_number.number;
+     this.newNumber.backupNumber = this.newNumber.number;
     },
     applyNumberMask() {
      document.getElementById("new__phone_number").addEventListener("input", (e) => {
       if (e.inputType !== "deleteContentBackward") {
-       this.new_number.number = this.new_number.number
+       this.newNumber.number = this.newNumber.number
         .replace(/[^0-9]/g, "")
         .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
         .substr(0, 14);
@@ -751,23 +750,23 @@
      });
     },
     nameClassesToggle() {
-     if (this.new_name.name === "") {
+     if (this.newName.name === "") {
       this.nameIsEmpty = true;
       this.nameIsCorrect = false;
       this.nameIsWrong = false;
      } else {
-      this.nameIsCorrect = !this.new_name.error;
-      this.nameIsWrong = this.new_name.error;
+      this.nameIsCorrect = !this.newName.error;
+      this.nameIsWrong = this.newName.error;
      }
     },
     numberClassesToggle() {
-     if (this.new_number.number === "") {
+     if (this.newNumber.number === "") {
       this.numberIsEmpty = true;
       this.numberIsCorrect = false;
       this.numberIsWrong = false;
      } else {
-      this.numberIsCorrect = !this.new_number.error;
-      this.numberIsWrong = this.new_number.error;
+      this.numberIsCorrect = !this.newNumber.error;
+      this.numberIsWrong = this.newNumber.error;
      }
     },
     resetForm() {
@@ -776,30 +775,30 @@
      this.resetNewNumber();
     },
     resetNewName() {
-     this.new_name.name = "";
-     this.new_name.error = false;
-     this.new_name.error_msg = "";
+     this.newName.name = "";
+     this.newName.error = false;
+     this.newName.error_msg = "";
     },
     resetNewNumber() {
-     this.new_number.number = "";
-     this.new_number.error = false;
-     this.new_number.error_msg = "";
+     this.newNumber.number = "";
+     this.newNumber.error = false;
+     this.newNumber.error_msg = "";
     },
     checkName() {
      //  Do accept space at the end
      //  var regex = /^([a-z]{3,}[\S]*(?=\s|$) ?){2,}$/gim;
 
-     if (this.new_name.name !== "") {
+     if (this.newName.name !== "") {
       //  Doesn't accept space at the end
       var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
-      var teste = regex.test(this.new_name.name);
+      var teste = regex.test(this.newName.name);
 
       if (teste) {
-       this.new_name.error = false;
+       this.newName.error = false;
        return true;
       } else {
-       this.new_name.error = true;
-       var elem = "new_name";
+       this.newName.error = true;
+       var elem = "newName";
        var msg = "Mínimo de 2 palavras. Cada palavra precisa começar com 3 letras.";
        this.updateErrorMsg(elem, msg);
       }
@@ -807,33 +806,33 @@
      return false;
     },
     checkNumber() {
-     var number = this.new_number.number;
+     var number = this.newNumber.number;
      var msg;
      if (number !== "" && number.length < 14) {
       msg = "Preecha o telefone corretamente.";
-      this.new_number.error = true;
-      this.updateErrorMsg("new_number", msg);
+      this.newNumber.error = true;
+      this.updateErrorMsg("newNumber", msg);
       return false;
      } else {
-      this.new_number.error = false;
+      this.newNumber.error = false;
       return true;
      }
     },
     checkIsSpecial() {
-     if (this.new_number.number.includes("(11) ")) {
-      this.new_number.special = true;
+     if (this.newNumber.number.includes("(11) ")) {
+      this.newNumber.special = true;
      } else {
-      this.new_number.special = false;
+      this.newNumber.special = false;
      }
     },
     updateErrorMsg(elem, msg) {
-     if (elem === "new_name") {
-      this.new_name.error = true;
-      this.new_name.error_msg = msg;
+     if (elem === "newName") {
+      this.newName.error = true;
+      this.newName.error_msg = msg;
      }
-     if (elem === "new_number") {
-      this.new_number.error = true;
-      this.new_number.error_msg = msg;
+     if (elem === "newNumber") {
+      this.newNumber.error = true;
+      this.newNumber.error_msg = msg;
      }
      if (elem === "modNameError") {
       this.editForm.modNameError = msg;
@@ -844,85 +843,85 @@
      }
     },
     disableNumberMask() {
-     this.new_number.number = this.new_number.backupNumber;
+     this.newNumber.number = this.newNumber.backupNumber;
     },
     addContact() {
      var contact = {};
      if (this.editForm.modName === "" && this.editForm.modNumber == "") {
       if (this.checkName() && this.checkNumber()) {
-       contact["id"] = this.id_cont;
-       contact["name"] = this.new_name.name;
-       contact["number"] = this.new_number.number;
-       contact["special"] = this.new_number.special;
+       contact["id"] = this.contactId;
+       contact["name"] = this.newName.name;
+       contact["number"] = this.newNumber.number;
+       contact["special"] = this.newNumber.special;
 
-       this.contact_list.push(contact);
+       this.contactList.push(contact);
        this.resetForm();
-       this.id_cont++;
-       this.show_add_btn = true;
+       this.contactId++;
+       this.showAddBtn = true;
       }
      } else if (!this.editForm.modNameError && !this.editForm.modNumberError) {
       contact["name"] = this.editForm.modName;
       contact["number"] = this.editForm.modNumber;
       contact["special"] = this.editForm.special;
 
-      this.contact_list[this.editForm.index] = contact;
-      console.log(this.contact_list[this.editForm.index]);
+      this.contactList[this.editForm.index] = contact;
+      console.log(this.contactList[this.editForm.index]);
       this.showEditForm = false;
       this.resetEditForm();
      }
     },
     updateLocalStorage(action) {
      if (action === "get") {
-      const json_contact_list = localStorage.getItem("contact_list");
-      this.contact_list = JSON.parse(json_contact_list) || [];
+      const jsonContactList = localStorage.getItem("contactList");
+      this.contactList = JSON.parse(jsonContactList) || [];
      }
      if (action === "set") {
-      localStorage.setItem("contact_list", JSON.stringify(this.contact_list));
+      localStorage.setItem("contactList", JSON.stringify(this.contactList));
      }
     },
     toggleShowFormBtn() {
-     if (this.show_add_btn) {
+     if (this.showAddBtn) {
       this.ShowForm(true, true);
-      this.show_add_btn = false;
+      this.showAddBtn = false;
      } else {
       this.ShowForm(true, false);
-      this.show_add_btn = true;
+      this.showAddBtn = true;
      }
     },
     ShowForm(imperative, value) {
      if (imperative) {
-      this.show_form = value;
+      this.showForm = value;
      } else {
-      if (this.contact_list.length) this.show_form = false;
-      else this.show_form = true;
+      if (this.contactList.length) this.showForm = false;
+      else this.showForm = true;
      }
     },
     ShowContactList(imperative, value) {
      if (imperative) {
-      this.show_list = value;
+      this.showContactList = value;
      } else {
-      if (this.contact_list.length > 0) this.show_list = true;
-      else this.show_list = false;
+      if (this.contactList.length > 0) this.showContactList = true;
+      else this.showContactList = false;
      }
     },
 
     // EDIT FORM FUNCTIONS
     toggleEditForm(index) {
-     if (this.show_form) {
-      this.show_form = !this.show_form;
+     if (this.showForm) {
+      this.showForm = !this.showForm;
      }
      if (this.showEditForm) {
       this.showEditForm = false;
-      this.show_add_btn = true;
+      this.showAddBtn = true;
       this.editForm.index = "";
      } else {
       this.showEditForm = true;
-      this.show_add_btn = false;
+      this.showAddBtn = false;
       this.getModInfo(index);
      }
     },
     getModInfo(index) {
-     var contact = this.contact_list[index];
+     var contact = this.contactList[index];
      this.editForm.index = index;
      this.editForm.modName = contact.name;
      this.editForm.modNumber = contact.number;
@@ -1008,7 +1007,7 @@
     },
     deleteContact(index, event) {
      if (confirm("Você tem certeza?")) {
-      this.contact_list.splice(index, 1);
+      this.contactList.splice(index, 1);
      }
     },
    },
