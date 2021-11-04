@@ -940,6 +940,8 @@
      this.editForm.modName.name = contact.name;
      this.editForm.modNumber.number = contact.number;
      this.editForm.modNumber.special = contact.special;
+     this.checkModName();
+     this.checkModNumber();
     },
     resetEditForm() {
      document.getElementById("edit_Form").reset();
@@ -957,16 +959,6 @@
      this.editForm.modNumber.number = "";
      this.editForm.modNumber.error = false;
      this.editForm.modNumber.errorMsg = "";
-    },
-    toggleModNameClasses() {
-     if (this.editForm.modName.name === "") {
-      this.toggleClasses.nameIsEmpty = true;
-      this.toggleClasses.nameIsCorrect = false;
-      this.toggleClasses.nameIsWrong = false;
-     } else {
-      this.toggleClasses.nameIsCorrect = !this.addForm.newName.error;
-      this.toggleClasses.nameIsWrong = this.addForm.newName.error;
-     }
     },
 
     // MOD NAME FUNCTIONS
