@@ -658,7 +658,7 @@
       showContactList: false,
      },
      toggleBtns: {
-      showAddBtn: true,
+      showAddBtn: false,
      },
      toggleClasses: {
       nameIsEmpty: true,
@@ -859,7 +859,6 @@
        this.contactList.push(contact);
        this.resetForm();
        this.idCont++;
-       this.toggleBtns.showAddBtn = true;
       }
      } else if (!this.editForm.modName.error && !this.editForm.modNumber.error) {
       contact["name"] = this.editForm.modName.name;
@@ -867,9 +866,11 @@
       contact["special"] = this.editForm.modNumber.special;
 
       this.contactList[this.editForm.index] = contact;
-      this.DOM.showEditForm = false;
+      // this.DOM.showEditForm = false;
+      this.toggleEditForm();
       this.resetEditForm();
      }
+     this.toggleBtns.showAddBtn = true;
     },
     updateLocalStorage(action) {
      if (action === "get") {
@@ -982,7 +983,7 @@
       this.updateErrorMsg("modNumber", msg);
      } else {
       this.editForm.modNumber.error = false;
-      this.toggleModNumberErrorMsg(false)
+      this.toggleModNumberErrorMsg(false);
      }
     },
     ModNumberMask(e) {
