@@ -32,7 +32,7 @@
     <button v-if="toggleBtns.showAddBtn" class="btn btn--add" @click="toggleShowFormBtn()">+</button>
     <!-- <button v-else class="btn btn--close" @click="toggleShowFormBtn()">x</button> -->
     <!--  v-if="showForm"-->
-    <div v-if="DOM.showAddForm" class="new_contact">
+    <section v-if="DOM.showAddForm" class="new_contact">
      <form action="#" class="form" id="contact_form">
       <h2 class="block__title">Adicione um novo contato</h2>
 
@@ -98,8 +98,8 @@
       <div v-if="addForm.newNumber.showErrorMsg" class="error_card">{{addForm.newNumber.errorMsg}}</div>
       <!-- ERROR MSG  -->
       <div class="form__options">
-       <button class="btn btn--green" @click.prevent="addContact(), resetForm()">Adicionar</button>
-       <button class="btn btn--clear" @click.prevent="resetForm()">Clear</button>
+       <button class="btn btn--green" @click.prevent="addContact(), resetAddForm()">Adicionar</button>
+       <button class="btn btn--clear" @click.prevent="resetAddForm()">Clear</button>
        <button class="btn btn--close_card" @click.prevent="toggleShowFormBtn">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
          <path
@@ -109,9 +109,9 @@
        </button>
       </div>
      </form>
-    </div>
+    </section>
 
-    <div v-if="DOM.showEditForm" class="new_contact">
+    <section v-if="DOM.showEditForm" class="new_contact">
      <form action="#" class="form" id="edit_Form">
       <h2 class="block__title">Modifique o contato</h2>
 
@@ -130,7 +130,7 @@
         id="mod__name"
         placeholder="Nome"
         v-model="editForm.modName.name"
-        @input="modNameInput($event)"
+        @input="modNameInput()"
         required="required"
        />
 
@@ -191,9 +191,9 @@
        </button>
       </div>
      </form>
-    </div>
+    </section>
 
-    <div v-if="DOM.showContactList" class="contact-list">
+    <section v-if="DOM.showContactList" class="contact-list">
      <h2 class="block__title">Seus contatos</h2>
      <table class="table">
       <thead class="table__head">
@@ -224,7 +224,7 @@
        </tr>
       </tbody>
      </table>
-    </div>
+    </section>
    </div>
   </div>
  </body>
@@ -709,6 +709,7 @@
    },
    created() {
     this.updateLocalStorage("get");
+    this.handleAddBtn();
    },
    computed: {},
    watch: {
@@ -725,6 +726,15 @@
     },
    },
    methods: {
+    // BUTTONS
+    handleAddBtn() {
+     if (!this.DOM.showAddForm && !this.DOM.showEditForm) {
+      this.toggleBtns.showAddBtn = true;
+     } else {
+      this.toggleBtns.showAddBtn = false;
+     }
+    },
+
     // NEW NAME INPUT
     newNameInput() {
      this.checkName();
@@ -815,10 +825,12 @@
     toggleNumberErrorMsg(value) {
      this.addForm.newNumber.showErrorMsg = value;
     },
-    resetForm() {
+    resetAddForm() {
      document.getElementById("contact_form").reset();
      this.resetNewName();
+     this.toggleNameClasses();
      this.resetNewNumber();
+     this.toggleNumberClasses();
     },
     resetNewName() {
      this.addForm.newName.name = "";
@@ -857,7 +869,7 @@
        contact["special"] = this.addForm.newNumber.special;
 
        this.contactList.push(contact);
-       this.resetForm();
+       this.resetAddForm();
        this.idCont++;
       }
      } else if (!this.editForm.modName.error && !this.editForm.modNumber.error) {
@@ -870,7 +882,7 @@
       this.toggleEditForm();
       this.resetEditForm();
      }
-     this.toggleBtns.showAddBtn = true;
+     this.handleAddBtn();
     },
     updateLocalStorage(action) {
      if (action === "get") {
@@ -932,10 +944,12 @@
     resetEditForm() {
      document.getElementById("edit_Form").reset();
      this.resetModName();
+     this.checkModName();
      this.resetModNumber();
+     this.checkModNumber();
     },
     resetModName() {
-     this.editForm.modName.number = "";
+     this.editForm.modName.name = "";
      this.editForm.modName.error = false;
      this.editForm.modName.errorMsg = "";
     },
@@ -944,11 +958,22 @@
      this.editForm.modNumber.error = false;
      this.editForm.modNumber.errorMsg = "";
     },
+    toggleModNameClasses() {
+     if (this.editForm.modName.name === "") {
+      this.toggleClasses.nameIsEmpty = true;
+      this.toggleClasses.nameIsCorrect = false;
+      this.toggleClasses.nameIsWrong = false;
+     } else {
+      this.toggleClasses.nameIsCorrect = !this.addForm.newName.error;
+      this.toggleClasses.nameIsWrong = this.addForm.newName.error;
+     }
+    },
+
     // MOD NAME FUNCTIONS
     modNameInput() {
-     this.ModNameMask();
+     this.checkModName();
     },
-    ModNameMask(e) {
+    checkModName() {
      //  Doesn't accept space at the end
      var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
      var test = regex.test(this.editForm.modName.name);
