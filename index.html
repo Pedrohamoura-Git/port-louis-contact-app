@@ -1,3 +1,5 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="pt-br">
  <head>
@@ -49,10 +51,11 @@
         id="new__name"
         placeholder="Nome"
         v-model="addForm.newName.name"
+        @input="newNameInput($event)"
         required="required"
        />
        <!-- v-if="toggleClasses.nameIsWrong" -->
-       <span v-if="toggleClasses.nameIsWrong" class="btn--warning_info" @click="nameToggleErrorMsg()">
+       <span v-if="toggleClasses.nameIsWrong" class="btn--warning_info" @click="toggleNameErrorMsg(!addForm.newName.showErrorMsg)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -80,12 +83,10 @@
         id="new__phone_number"
         placeholder="telefone"
         v-model="addForm.newNumber.number"
-        @input="addForm.newNumberInput()"
-        @keydown.backspace="disableNumberMask()"
+        @input="newNumberInput($event)"
         required="required"
        />
-       <!-- v-if="toggleClasses.numberIsWrong" -->
-       <span v-if="toggleClasses.numberIsWrong" class="btn--warning_info" @click="numberToggleErrorMsg()">
+       <span v-if="toggleClasses.numberIsWrong" class="btn--warning_info" @click="toggleNumberErrorMsg(!addForm.newNumber.showErrorMsg)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -134,7 +135,7 @@
        />
 
        <!-- Error icon  -->
-       <span v-if="editForm.modName.error" class="btn--warning_info" @click="toggleModNameErrorMsg()">
+       <span v-if="editForm.modName.error" class="btn--warning_info" @click="toggleModNameErrorMsg(!editForm.modName.showErrorMsg)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -166,7 +167,7 @@
         required="required"
        />
        <!-- v-if="toggleClasses.numberIsWrong" -->
-       <span v-if="editForm.modNumber.error" class="btn--warning_info" @click="toggleModNumberErrorMsg()">
+       <span v-if="editForm.modNumber.error" class="btn--warning_info" @click="toggleModNumberErrorMsg(!editForm.modNumber.showErrorMsg)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
          <path
           d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-.001 5.75c.69 0 1.251.56 1.251 1.25s-.561 1.25-1.251 1.25-1.249-.56-1.249-1.25.559-1.25 1.249-1.25zm2.001 12.25h-4v-1c.484-.179 1-.201 1-.735v-4.467c0-.534-.516-.618-1-.797v-1h3v6.265c0 .535.517.558 1 .735v.999z"
@@ -716,84 +717,18 @@
       this.updateLocalStorage("set");
       this.updateDOM();
       this.toggleShowContactList();
+      this.toggleNameClasses();
+      this.toggleNumberClasses();
      },
-     deep: true,
-    },
-    "addForm.newName": {
-     handler() {
-      this.checkName();
-      this.nameClassesToggle();
-     },
-     deep: true,
-    },
-    "addForm.newNumber": {
-     handler() {
-      this.checkNumber();
-      this.checkIsSpecial();
-      this.numberClassesToggle();
-     },
+
      deep: true,
     },
    },
    methods: {
-    nameToggleErrorMsg() {
-     this.addForm.newName.showErrorMsg = !this.addForm.newName.showErrorMsg;
-    },
-    numberToggleErrorMsg() {
-     this.addForm.newNumber.showErrorMsg = !this.addForm.newNumber.showErrorMsg;
-    },
-    newNumberInput() {
-     this.doNumberBackup();
-     this.applyNumberMask();
-    },
-    doNumberBackup() {
-     this.addForm.newNumber.backupNumber = this.addForm.newNumber.number;
-    },
-    applyNumberMask() {
-     document.getElementById("new__phone_number").addEventListener("input", (e) => {
-      if (e.inputType !== "deleteContentBackward") {
-       this.addForm.newNumber.number = this.addForm.newNumber.number
-        .replace(/[^0-9]/g, "")
-        .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
-        .substr(0, 14);
-      }
-     });
-    },
-    nameClassesToggle() {
-     if (this.addForm.newName.name === "") {
-      this.toggleClasses.nameIsEmpty = true;
-      this.toggleClasses.nameIsCorrect = false;
-      this.toggleClasses.nameIsWrong = false;
-     } else {
-      this.toggleClasses.nameIsCorrect = !this.addForm.newName.error;
-      this.toggleClasses.nameIsWrong = this.addForm.newName.error;
-     }
-     console.log("nameClassesToggle");
-    },
-    numberClassesToggle() {
-     if (this.addForm.newNumber.number === "") {
-      this.toggleClasses.numberIsEmpty = true;
-      this.toggleClasses.numberIsCorrect = false;
-      this.toggleClasses.numberIsWrong = false;
-     } else {
-      this.toggleClasses.numberIsCorrect = !this.addForm.newNumber.error;
-      this.toggleClasses.numberIsWrong = this.addForm.newNumber.error;
-     }
-    },
-    resetForm() {
-     document.getElementById("contact_form").reset();
-     this.resetNewName();
-     this.addForm.resetNewNumber();
-    },
-    resetNewName() {
-     this.addForm.newName.name = "";
-     this.addForm.newName.error = false;
-     this.addForm.newName.errorMsg = "";
-    },
-    resetNewNumber() {
-     this.addForm.newNumber.number = "";
-     this.addForm.newNumber.error = false;
-     this.addForm.newNumber.errorMsg = "";
+    // NEW NAME INPUT
+    newNameInput() {
+     this.checkName();
+     this.toggleNameClasses();
     },
     checkName() {
      //  Do accept space at the end
@@ -802,20 +737,49 @@
      if (this.addForm.newName.name !== "") {
       //  Doesn't accept space at the end
       var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
-      var teste = regex.test(this.addForm.newName.name);
+      var test = regex.test(this.addForm.newName.name);
 
-      if (teste) {
+      if (test) {
        this.addForm.newName.error = false;
+       this.toggleNameErrorMsg(false);
        return true;
       } else {
        this.addForm.newName.error = true;
        var elem = "newName";
        var msg = "Mínimo de 2 palavras. Cada palavra precisa começar com 3 letras.";
        this.updateErrorMsg(elem, msg);
-       console.log("checkName");
       }
      }
      return false;
+    },
+    toggleNameClasses() {
+     if (this.addForm.newName.name === "") {
+      this.toggleClasses.nameIsEmpty = true;
+      this.toggleClasses.nameIsCorrect = false;
+      this.toggleClasses.nameIsWrong = false;
+     } else {
+      this.toggleClasses.nameIsCorrect = !this.addForm.newName.error;
+      this.toggleClasses.nameIsWrong = this.addForm.newName.error;
+     }
+    },
+    toggleNameErrorMsg(value) {
+     this.addForm.newName.showErrorMsg = value;
+    },
+
+    // NEW NAME INPUT
+    newNumberInput(e) {
+     this.applyNumberMask(e);
+     this.checkNumber();
+     this.checkIsSpecial();
+     this.toggleNumberClasses();
+    },
+    applyNumberMask(e) {
+     if (e.inputType !== "deleteContentBackward") {
+      this.addForm.newNumber.number = this.addForm.newNumber.number
+       .replace(/[^0-9]/g, "")
+       .replace(/^(\d{2})?(\d{4})?(\d{4})?/g, "($1) $2-$3")
+       .substr(0, 14);
+     }
     },
     checkNumber() {
      var number = this.addForm.newNumber.number;
@@ -827,6 +791,7 @@
       return false;
      } else {
       this.addForm.newNumber.error = false;
+      this.toggleNumberErrorMsg(false);
       return true;
      }
     },
@@ -836,6 +801,34 @@
      } else {
       this.addForm.newNumber.special = false;
      }
+    },
+    toggleNumberClasses() {
+     if (this.addForm.newNumber.number === "") {
+      this.toggleClasses.numberIsEmpty = true;
+      this.toggleClasses.numberIsCorrect = false;
+      this.toggleClasses.numberIsWrong = false;
+     } else {
+      this.toggleClasses.numberIsCorrect = !this.addForm.newNumber.error;
+      this.toggleClasses.numberIsWrong = this.addForm.newNumber.error;
+     }
+    },
+    toggleNumberErrorMsg(value) {
+     this.addForm.newNumber.showErrorMsg = value;
+    },
+    resetForm() {
+     document.getElementById("contact_form").reset();
+     this.resetNewName();
+     this.resetNewNumber();
+    },
+    resetNewName() {
+     this.addForm.newName.name = "";
+     this.addForm.newName.error = false;
+     this.addForm.newName.errorMsg = "";
+    },
+    resetNewNumber() {
+     this.addForm.newNumber.number = "";
+     this.addForm.newNumber.error = false;
+     this.addForm.newNumber.errorMsg = "";
     },
     updateErrorMsg(elem, msg) {
      if (elem === "newName") {
@@ -850,18 +843,13 @@
       this.editForm.modName.errorMsg = msg;
      }
      if (elem === "modNumber") {
-      console.log(`${msg}`);
-      console.log(`${this.editForm.modNumber.errorMsg}`);
       this.editForm.modNumber.error = true;
       this.editForm.modNumber.errorMsg = msg;
      }
     },
-    disableNumberMask() {
-     this.addForm.newNumber.number = this.addForm.newNumber.backupNumber;
-    },
     addContact() {
      var contact = {};
-     if (this.editForm.modName === "" && this.editForm.modNumber == "") {
+     if (this.editForm.modName.name === "" && this.editForm.modNumber.number === "") {
       if (this.checkName() && this.checkNumber()) {
        contact["id"] = this.idCont;
        contact["name"] = this.addForm.newName.name;
@@ -879,7 +867,6 @@
       contact["special"] = this.editForm.modNumber.special;
 
       this.contactList[this.editForm.index] = contact;
-      console.log(this.contactList[this.editForm.index]);
       this.DOM.showEditForm = false;
       this.resetEditForm();
      }
@@ -902,7 +889,6 @@
       this.toggleBtns.showAddBtn = true;
      }
     },
-    // updateDOM(elem, value) {
     updateDOM(imperative, value) {
      if (imperative) {
       this.DOM.showAddForm = value;
@@ -946,32 +932,29 @@
      document.getElementById("edit_Form").reset();
      this.resetModName();
      this.resetModNumber();
-     console.log("reseted");
     },
     resetModName() {
      this.editForm.modName.number = "";
      this.editForm.modName.error = false;
      this.editForm.modName.errorMsg = "";
-     console.log("reseted MODName");
     },
     resetModNumber() {
      this.editForm.modNumber.number = "";
      this.editForm.modNumber.error = false;
      this.editForm.modNumber.errorMsg = "";
-     console.log("reseted 2");
     },
     // MOD NAME FUNCTIONS
     modNameInput() {
      this.ModNameMask();
-     //  this.modNameInput();
     },
     ModNameMask(e) {
      //  Doesn't accept space at the end
      var regex = /^([a-z]{3,}[\S]*(?=\s[a-z]|$) ?){2,}$/gim;
-     var teste = regex.test(this.editForm.modName.name);
+     var test = regex.test(this.editForm.modName.name);
 
-     if (teste) {
+     if (test) {
       this.editForm.modName.error = false;
+      this.toggleModNameErrorMsg(false);
       return true;
      } else {
       this.editForm.modName.error = true;
@@ -980,8 +963,8 @@
       this.updateErrorMsg(elem, msg);
      }
     },
-    toggleModNameErrorMsg() {
-     this.editForm.modName.showErrorMsg = !this.editForm.modName.showErrorMsg;
+    toggleModNameErrorMsg(value) {
+     this.editForm.modName.showErrorMsg = value;
     },
 
     // MOD NUMBER FUNCTIONS
@@ -989,7 +972,6 @@
      this.ModNumberMask(e);
      this.checkModNumber();
      this.checkModIsSpecial();
-     console.log(this.editForm.modNumber.special);
     },
     checkModNumber() {
      var modNumber = this.editForm.modNumber.number;
@@ -1000,6 +982,7 @@
       this.updateErrorMsg("modNumber", msg);
      } else {
       this.editForm.modNumber.error = false;
+      this.toggleModNumberErrorMsg(false)
      }
     },
     ModNumberMask(e) {
@@ -1017,12 +1000,13 @@
       this.editForm.modNumber.special = false;
      }
     },
-    toggleModNumberErrorMsg() {
-     this.editForm.modNumber.showErrorMsg = !this.editForm.modNumber.showErrorMsg;
+    toggleModNumberErrorMsg(value) {
+     this.editForm.modNumber.showErrorMsg = value;
     },
     deleteContact(index, event) {
      if (confirm("Você tem certeza?")) {
       this.contactList.splice(index, 1);
+      this.toggleShowFormBtn();
      }
     },
    },
