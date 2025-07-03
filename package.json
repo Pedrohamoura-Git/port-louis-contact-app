@@ -1,0 +1,12 @@
+{
+  "name": "port-louis-contact-app",
+  "version": "1.0.0",
+  "homepage": "https://Pedrohamoura-Git.github.io/port-louis-contact-app/",
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  }
+}
